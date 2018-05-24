@@ -1,0 +1,2215 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lecture 12</title>
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/white.css">
+    <link rel="stylesheet" href="css/theme/custom.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+    <!-- Printing and PDF exports -->
+    <script>
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+    document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+
+<body>
+    <div class="reveal" style="background-color: #fff;">
+        <div class="slides">
+            <section data-background-video="bgm.mp4" data-background-video-loop data-background-video-muted style="text-align: left;">
+                <h2 style="color: white">Python Programming</h2>
+                <h5 style="color: white">Lecture 12 Numpy, Pandas Basics</h5>
+            </section>
+            <section>
+                <section data-background="#2980b9" style="color: white">
+                    <h2 style="color: white">12.1 NumPy (3)</h2>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>Mathematical and Statistical Methods</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [177]: arr = np.random.randn(5, 4)
+In [178]: arr
+Out[178]:
+array([[ 2.1695, -0.1149, 2.0037, 0.0296],
+[ 0.7953, 0.1181, -0.7485, 0.585 ],
+[ 0.1527, -1.5657, -0.5625, -0.0327],
+[-0.929 , -0.4826, -0.0363, 1.0954],
+[ 0.9809, -0.5895, 1.5817, -0.5287]])
+
+In [179]: arr.mean()
+Out[179]: 0.19607051119998253
+In [180]: np.mean(arr)
+Out[180]: 0.19607051119998253
+In [181]: arr.sum()
+Out[181]: 3.9214102239996507
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [182]: arr.mean(axis=1)
+Out[182]: array([ 1.022 , 0.1875, -0.502 , -0.0881, 0.3611])
+In [183]: arr.sum(axis=0)
+Out[183]: array([ 3.1693, -2.6345, 2.2381, 1.1486])
+</code></pre>
+                    </div>
+                    <p class="fragment">Here, arr.mean(1) means “compute mean across the columns” where arr.sum(0) means “compute sum down the rows.”</p>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [184]: arr = np.array([0, 1, 2, 3, 4, 5, 6, 7])
+In [185]: arr.cumsum()
+Out[185]: array([ 0, 1, 3, 6, 10, 15, 21, 28])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [186]: arr = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+In [187]: arr
+Out[187]:
+array([[0, 1, 2],
+[3, 4, 5],
+[6, 7, 8]])
+
+In [188]: arr.cumsum(axis=0)
+Out[188]:
+array([[ 0, 1, 2],
+[ 3, 5, 7],
+[ 9, 12, 15]])
+
+In [189]: arr.cumprod(axis=1)
+Out[189]:
+array([[ 0, 0, 0],
+[ 3, 12, 60],
+[ 6, 42, 336]])
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>Sorting</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [195]: arr = np.random.randn(6)
+In [196]: arr
+Out[196]: array([ 0.6095, -0.4938, 1.24 , -0.1357, 1.43 , -0.8469])
+In [197]: arr.sort()
+In [198]: arr
+Out[198]: array([-0.8469, -0.4938, -0.1357, 0.6095, 1.24 , 1.43 ])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [199]: arr = np.random.randn(5, 3)
+In [200]: arr
+Out[200]:
+array([[ 0.6033, 1.2636, -0.2555],
+[-0.4457, 0.4684, -0.9616],
+[-1.8245, 0.6254, 1.0229],
+[ 1.1074, 0.0909, -0.3501],
+[ 0.218 , -0.8948, -1.7415]])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [201]: arr.sort(1)
+In [202]: arr
+Out[202]:
+array([[-0.2555, 0.6033, 1.2636],
+[-0.9616, -0.4457, 0.4684],
+[-1.8245, 0.6254, 1.0229],
+[-0.3501, 0.0909, 1.1074],
+[-1.7415, -0.8948, 0.218 ]])
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [203]: large_arr = np.random.randn(1000)
+In [204]: large_arr.sort()
+In [205]: large_arr[int(0.05 * len(large_arr))] # 5% quantile
+Out[205]: -1.5311513550102103
+</code></pre>
+                    </div>
+                    <ul>
+                        <li class="fragment">
+                            <p>Unique</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [206]: names = np.array(['Bob', 'Joe', 'Will', 'Bob', 'Will', 'Joe', 'Joe'])
+In [207]: np.unique(names)
+Out[207]:
+array(['Bob', 'Joe', 'Will'],
+dtype='&lt;U4')
+In [208]: ints = np.array([3, 3, 3, 2, 2, 1, 1, 4, 4])
+In [209]: np.unique(ints)
+Out[209]: array([1, 2, 3, 4])
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>File Input and Output with Arrays</p>
+                        </li>
+                        <li class="fragment">
+                            <p>np.save and np.load are the two workhorse functions for efficiently saving and loading array data on disk. Arrays are saved by default in an uncompressed raw binary format with file extension .npy:</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [213]: arr = np.arange(10)
+In [214]: np.save('some_array', arr)
+
+In [215]: np.load('some_array.npy')
+Out[215]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+</code></pre>
+                    </div>
+                    <ul>
+                        <li class="fragment">
+                            <p>You save multiple arrays in an uncompressed archive using np.savez and passing the arrays as keyword arguments:</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [216]: np.savez('array_archive.npz', a=arr, b=arr)
+
+In [217]: arch = np.load('array_archive.npz') #Dictionary
+In [218]: arch['b']
+Out[218]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+In [219]: np.savez_compressed('arrays_compressed.npz', a=arr, b=arr)
+In [216]: np.savetxt('array_archive.txt', arr)
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>Linear Algebra</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [223]: x = np.array([[1., 2., 3.], [4., 5., 6.]])
+In [224]: y = np.array([[6., 23.], [-1, 7], [8, 9]])
+In [225]: x
+Out[225]:
+array([[ 1., 2., 3.],
+[ 4., 5., 6.]])
+
+In [226]: y
+Out[226]:
+array([[ 6., 23.],
+[ -1., 7.],
+[ 8., 9.]])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [227]: x.dot(y)
+Out[227]:
+array([[ 28., 64.],
+[ 67., 181.]])
+
+In [228]: np.dot(x, y)
+Out[228]:
+array([[ 28., 64.],
+[ 67., 181.]])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [229]: np.dot(x, np.ones(3))
+Out[229]: array([ 6., 15.])
+
+In [230]: x @ np.ones(3)
+Out[230]: array([ 6., 15.])
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [231]: from numpy.linalg import inv, qr
+
+In [232]: X = np.random.randn(5, 5)
+
+In [233]: mat = X.T.dot(X)
+
+In [234]: inv(mat)
+Out[234]:
+array([[ 933.1189, 871.8258, -1417.6902, -1460.4005, 1782.1391],
+[ 871.8258, 815.3929, -1325.9965, -1365.9242, 1666.9347],
+[-1417.6902, -1325.9965, 2158.4424, 2222.0191, -2711.6822],
+[-1460.4005, -1365.9242, 2222.0191, 2289.0575, -2793.422 ],
+[ 1782.1391, 1666.9347, -2711.6822, -2793.422 , 3409.5128]])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [235]: mat.dot(inv(mat))
+Out[235]:
+array([[ 1., 0., -0., -0., -0.],
+[-0., 1., 0., 0., 0.],
+[ 0., 0., 1., 0., 0.],
+[-0., 0., 0., 1., -0.],
+[-0., 0., 0., 0., 1.]])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [236]: q, r = qr(mat)
+In [237]: r
+Out[237]:
+array([[-1.6914, 4.38 , 0.1757, 0.4075, -0.7838],
+[ 0. , -2.6436, 0.1939, -3.072 , -1.0702],
+[ 0. , 0. , -0.8138, 1.5414, 0.6155],
+[ 0. , 0. , 0. , -2.6445, -2.1669],
+[ 0. , 0. , 0. , 0. , 0.0002]])
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="F1.png" style="height: 150pt"></div>
+                    <div class="fragment"><img data-src="F2.png" style="height: 200pt"></div>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>Pseudorandom Number Generation</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [238]: samples = np.random.normal(size=(4, 4))
+In [239]: samples
+Out[239]:
+array([[ 0.5732, 0.1933, 0.4429, 1.2796],
+[ 0.575 , 0.4339, -0.7658, -1.237 ],
+[-0.5367, 1.8545, -0.92 , -0.1082],
+[ 0.1525, 0.9435, -1.0953, -0.144 ]])
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>Example: Random Walks</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [251]: nsteps = 1000
+In [252]: draws = np.random.randint(0, 2, size=nsteps)
+In [253]: steps = np.where(draws > 0, 1, -1)
+In [254]: walk = steps.cumsum()
+
+In [255]: walk.min()
+Out[255]: -3
+
+In [256]: walk.max()
+Out[256]: 31
+
+In [257]: (np.abs(walk) >= 10).argmax()
+Out[257]: 37
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>Simulating Many Random Walks at Once</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [258]: nwalks = 5000
+In [259]: nsteps = 1000
+In [260]: draws = np.random.randint(0, 2, size=(nwalks, nsteps)) # 0 or 1
+In [261]: steps = np.where(draws > 0, 1, -1)
+In [262]: walks = steps.cumsum(1)
+
+In [263]: walks
+Out[263]:
+array([[ 1, 0, 1, ..., 8, 7, 8],
+[ 1, 0, -1, ..., 34, 33, 32],
+[ 1, 0, -1, ..., 4, 5, 4],
+...,
+[ 1, 2, 1, ..., 24, 25, 26],
+[ 1, 2, 3, ..., 14, 13, 14],
+[ -1, -2, -3, ..., -24, -23, -22]])
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [264]: walks.max()
+Out[264]: 138
+In [265]: walks.min()
+Out[265]: -133
+
+In [266]: hits30 = (np.abs(walks) >= 30).any(1)
+In [267]: hits30
+Out[267]: array([False, True, False, ..., False, True, False], dtype=bool)
+In [268]: hits30.sum() # Number that hit 30 or -30
+Out[268]: 3410
+
+In [269]: crossing_times = (np.abs(walks[hits30]) >= 30).argmax(1)
+In [270]: crossing_times.mean()
+Out[270]: 498.88973607038122
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h3>Summary: Numpy (3)</h3>
+                    <ul>
+                        <li class="fragement">
+                            <p>Maths and Stats methods: arr.mean()(arr.mean(axis=1)), arr.sum(), arr.cumsum(), arr.cumprod(), arr.sort(), np.unique()</p>
+                        </li>
+                        <li class="fragement">
+                            <p>File Input and Output: np.save('some_array', arr), np.load('some_array.npy'), np.savez('array_archive.npz', a=arr, b=arr), np.savez_compressed('arrays_compressed.npz', a=arr, b=arr), np.savetxt('array_archive.txt', arr)
+                            </p>
+                        </li>
+                        <li class="fragement">
+                            <p>Linear Algebra: .dot (@), inv(), qr(), diag(), det(), trace, eig, solve, lstsq</p>
+                        </li>
+                        <li class="fragement">
+                            <p>Random: np.random.normal(size=(4,4)) </p>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+            <section>
+                <section data-background="#2980b9" style="color: white">
+                    <h2 style="color: white">12.2 Pandas (1)</h2>
+                </section>
+                <section>
+                    <ul>
+                        <li class="fragment">
+                            <p>Pandas is designed for working with tabular or heterogeneous data. It contains data structures and data manipulation tools designed to make data cleaning and analysis fast and easy in Python.</p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [1]: import pandas as pd
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h6>Introduction to pandas Data Structures</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [11]: obj = pd.Series([4, 7, -5, 3])
+In [12]: obj
+Out[12]:
+0 4
+1 7
+2 -5
+3 3
+dtype: int64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [13]: obj.values
+Out[13]: array([ 4, 7, -5, 3])
+In [14]: obj.index # like range(4)
+Out[14]: RangeIndex(start=0, stop=4, step=1)
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">Often it will be desirable to create a Series with an index identifying each data point with a label:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [15]: obj2 = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
+In [16]: obj2
+Out[16]:
+d 4
+b 7
+a -5
+c 3
+dtype: int64
+
+In [17]: obj2.index
+Out[17]: Index(['d', 'b', 'a', 'c'], dtype='object')
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [18]: obj2['a']
+Out[18]: -5
+In [19]: obj2['d'] = 6
+In [20]: obj2[['c', 'a', 'd']]
+Out[20]:
+c 3
+a -5
+d 6
+dtype: int64
+</code></pre>
+                    </div>
+                    <p class="fragment">Here ['c', 'a', 'd'] is interpreted as a list of indices, even though it contains strings instead of integers.</p>
+                </section>
+                <section>
+                    <h6 class="fragment">Filtering with boolean array</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [21]: obj2[obj2 > 0]
+Out[21]:
+d 6
+b 7
+c 3
+dtype: int64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [22]: obj2 * 2
+Out[22]:
+d 12
+b 14
+a -10
+c 6
+dtype: int64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [23]: np.exp(obj2)
+Out[23]:
+d 403.428793
+b 1096.633158
+a 0.006738
+c 20.085537
+dtype: float64
+</code></pre>
+                    </div>
+                    <p class="fragment">Another way to think about a Series is as a fixed-length, <b>ordered</b> dict, as it is a mapping of index values to data values.</p>
+                </section>
+                <section>
+                    <p class="fragment">Should you have data contained in a Python dict, you can create a Series from it by passing the dict:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [26]: sdata = {'Ohio': 35000, 'Texas': 71000, 'Oregon': 16000, 'Utah': 5000}
+In [27]: obj3 = pd.Series(sdata)
+In [28]: obj3
+Out[28]:
+Ohio 35000
+Oregon 16000
+Texas 71000
+Utah 5000
+dtype: int64
+</code></pre>
+                    </div>
+                    <p class="fragment">When you are only passing a dict, the index in the resulting Series will have the dict’s keys in sorted order. You can override this by passing the dict keys in the order you want them to appear in the resulting Series:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [29]: states = ['California', 'Ohio', 'Oregon', 'Texas']
+In [30]: obj4 = pd.Series(sdata, index=states)
+In [31]: obj4
+Out[31]:
+California NaN
+Ohio 35000.0
+Oregon 16000.0
+Texas 71000.0
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">The isnull and notnull functions in pandas should be used to detect missing data:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [32]: pd.isnull(obj4)
+Out[32]:
+California True
+Ohio False
+Oregon False
+Texas False
+dtype: bool
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [33]: pd.notnull(obj4)
+Out[33]:
+California False
+Ohio True
+Oregon True
+Texas True
+dtype: bool
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [34]: obj4.isnull()
+Out[34]:
+California True
+Ohio False
+Oregon False
+Texas False
+dtype: bool
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">A useful Series feature for many applications is that it automatically aligns by index label in arithmetic operations:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [35]: obj3
+Out[35]:
+Ohio 35000
+Oregon 16000
+Texas 71000
+Utah 5000
+dtype: int64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [36]: obj4
+Out[36]:
+California NaN
+Ohio 35000.0
+Oregon 16000.0
+Texas 71000.0
+dtype: float64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [37]: obj3 + obj4
+Out[37]:
+California NaN
+Ohio 70000.0
+Oregon 32000.0
+Texas 142000.0
+Utah NaN
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">Both the Series object itself and its index have a name attribute, which integrates with other key areas of pandas functionality:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [38]: obj4.name = 'population'
+In [39]: obj4.index.name = 'state'
+In [40]: obj4
+Out[40]:
+state
+California NaN
+Ohio 35000.0
+Oregon 16000.0
+Texas 71000.0
+Name: population, dtype: float64
+</code></pre>
+                    </div>
+                    <p class="fragment">A Series’s index can be altered in-place by assignment:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [41]: obj
+Out[41]:
+0 4
+1 7
+2 -5
+3 3
+dtype: int64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [42]: obj.index = ['Bob', 'Steve', 'Jeff', 'Ryan']
+In [43]: obj
+Out[43]:
+Bob 4
+Steve 7
+Jeff -5
+Ryan 3
+dtype: int64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h6>DataFrame</h6>
+                    <p class="fragment">A DataFrame represents a rectangular table of data and contains an ordered collection of columns, each of which can be a different value type (numeric, string, boolean, etc.).</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+'year': [2000, 2001, 2002, 2001, 2002, 2003],
+'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+frame = pd.DataFrame(data)
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [45]: frame
+Out[45]:
+  pop state year
+0 1.5 Ohio 2000
+1 1.7 Ohio 2001
+2 3.6 Ohio 2002
+3 2.4 Nevada 2001
+4 2.9 Nevada 2002
+5 3.2 Nevada 2003
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">For large DataFrames, the head method selects only the first five rows:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [46]: frame.head()
+Out[46]:
+  pop state year
+0 1.5 Ohio 2000
+1 1.7 Ohio 2001
+2 3.6 Ohio 2002
+3 2.4 Nevada 2001
+4 2.9 Nevada 2002
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [47]: pd.DataFrame(data, columns=['year', 'state', 'pop'])
+Out[47]:
+  year state pop
+0 2000 Ohio 1.5
+1 2001 Ohio 1.7
+2 2002 Ohio 3.6
+3 2001 Nevada 2.4
+4 2002 Nevada 2.9
+5 2003 Nevada 3.2
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">If you pass a column that isn’t contained in the dict, it will appear with missing values in the result:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [48]: frame2 = pd.DataFrame(data, columns=['year', 'state', 'pop', 'debt'],
+....: index=['one', 'two', 'three', 'four',
+....: 'five', 'six'])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [49]: frame2
+Out[49]:
+    year state pop debt
+one 2000 Ohio 1.5 NaN
+two 2001 Ohio 1.7 NaN
+three 2002 Ohio 3.6 NaN
+four 2001 Nevada 2.4 NaN
+five 2002 Nevada 2.9 NaN
+six 2003 Nevada 3.2 NaN
+
+In [50]: frame2.columns
+Out[50]: Index(['year', 'state', 'pop', 'debt'], dtype='object')
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">
+                        A column in a DataFrame can be retrieved as a Series either by dict-like notation or by attribute:
+                    </p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [51]: frame2['state']
+Out[51]:
+one Ohio
+two Ohio
+three Ohio
+four Nevada
+five Nevada
+six Nevada
+Name: state, dtype: object
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [52]: frame2.year
+Out[52]:
+one 2000
+two 2001
+three 2002
+four 2001
+five 2002
+six 2003
+Name: year, dtype: int64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">Rows can also be retrieved by position or name with the special loc attribute:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [53]: frame2.loc['three']
+Out[53]:
+year 2002
+state Ohio
+pop 3.6
+debt NaN
+Name: three, dtype: object
+</code></pre>
+                    </div>
+                    <p class="fragment">Columns can be modified by assignment.</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [54]: frame2['debt'] = 16.5
+In [55]: frame2
+Out[55]:
+    year state pop debt
+one 2000 Ohio 1.5 16.5
+two 2001 Ohio 1.7 16.5
+three 2002 Ohio 3.6 16.5
+four 2001 Nevada 2.4 16.5
+five 2002 Nevada 2.9 16.5
+six 2003 Nevada 3.2 16.5
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [56]: frame2['debt'] = np.arange(6.)
+In [57]: frame2
+Out[57]:
+    year state pop debt
+one 2000 Ohio 1.5 0.0
+two 2001 Ohio 1.7 1.0
+three 2002 Ohio 3.6 2.0
+four 2001 Nevada 2.4 3.0
+five 2002 Nevada 2.9 4.0
+six 2003 Nevada 3.2 5.0
+</code></pre>
+                    </div>
+                    <p class="fragment">When you are assigning lists or arrays to a column, the value’s length must match the length of the DataFrame. If you assign a Series, its labels will be realigned exactly to the DataFrame’s index, inserting missing values in any holes:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [58]: val = pd.Series([-1.2, -1.5, -1.7], index=['two', 'four', 'five'])
+In [59]: frame2['debt'] = val
+In [60]: frame2
+Out[60]:
+    year state pop debt
+one 2000 Ohio 1.5 NaN
+two 2001 Ohio 1.7 -1.2
+three 2002 Ohio 3.6 NaN
+four 2001 Nevada 2.4 -1.5
+five 2002 Nevada 2.9 -1.7
+six 2003 Nevada 3.2 NaN
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [61]: frame2['eastern'] = frame2.state == 'Ohio'
+In [62]: frame2
+Out[62]:
+    year state pop debt eastern
+one 2000 Ohio 1.5 NaN True
+two 2001 Ohio 1.7 -1.2 True
+three 2002 Ohio 3.6 NaN True
+four 2001 Nevada 2.4 -1.5 False
+five 2002 Nevada 2.9 -1.7 False
+six 2003 Nevada 3.2 NaN False
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [63]: del frame2['eastern']
+In [64]: frame2.columns
+Out[64]: Index(['year', 'state', 'pop', 'debt'], dtype='object')
+</code></pre>
+                    </div>
+                    <p class="fragment">The column returned from indexing a DataFrame is a view on the underlying data, not a copy. Thus, any in-place modifications to the Series will be reflected in the DataFrame. The column can be explicitly copied with the Series’s copy method.</p>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [65]: pop = {'Nevada': {2001: 2.4, 2002: 2.9},
+....: 'Ohio': {2000: 1.5, 2001: 1.7, 2002: 3.6}}
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [66]: frame3 = pd.DataFrame(pop)
+In [67]: frame3
+Out[67]:
+    Nevada Ohio
+2000 NaN 1.5
+2001 2.4 1.7
+2002 2.9 3.6
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [68]: frame3.T
+Out[68]:
+    2000 2001 2002
+Nevada NaN 2.4 2.9
+Ohio 1.5 1.7 3.6
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">The keys in the inner dicts are combined and sorted to form the index in the result. This isn’t true if an explicit index is specified:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [69]: pd.DataFrame(pop, index=[2001, 2002, 2003])
+Out[69]:
+    Nevada Ohio
+2001 2.4 1.7
+2002 2.9 3.6
+2003 NaN NaN
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [70]: pdata = {'Ohio': frame3['Ohio'][:-1],
+....: 'Nevada': frame3['Nevada'][:2]}
+In [71]: pd.DataFrame(pdata)
+Out[71]:
+    Nevada Ohio
+2000 NaN 1.5
+2001 2.4 1.7
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [72]: frame3.index.name = 'year'; frame3.columns.name = 'state'
+In [73]: frame3
+Out[73]:
+state Nevada Ohio
+year
+2000 NaN 1.5
+2001 2.4 1.7
+2002 2.9 3.6
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [74]: frame3.values
+Out[74]:
+array([[ nan, 1.5],
+    [ 2.4, 1.7],
+    [ 2.9, 3.6]])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [75]: frame2.values
+Out[75]:
+array([[2000, 'Ohio', 1.5, nan],
+    [2001, 'Ohio', 1.7, -1.2],
+    [2002, 'Ohio', 3.6, nan],
+    [2001, 'Nevada', 2.4, -1.5],
+    [2002, 'Nevada', 2.9, -1.7],
+    [2003, 'Nevada', 3.2, nan]], dtype=object)
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h3>Summary: Pandas (1)</h3>
+                    <ul>
+                        <li class="fragement">
+                            <p>Create: obj = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c']), obj.values, obj.index (like an ordered dictionary), sdata = pd.Series({'Ohio': 35000})</p>
+                        </li>
+                        <li class="fragement">
+                            <p>Filter: obj2[obj2 > 0]; obj2*2, np.exp(obj2)</p>
+                        </li>
+                        <li class="fragement">
+                            <p>Detect null: pd.isnull(obj4), pd.notnull(obj4), obj4.isnull()</p>
+                        </li>
+                        <li class="fragement">
+                            <p>Name: obj4.name, obj4.index.name</p>
+                        </li>
+                        <li class="fragement">
+                            <p>DataFrame: pd.DataFrame(data), pd.DataFrame(data, columns=['year', 'state', 'pop']), frame2.loc['three'] <b>(rows)</b>, pd.DataFrame(pop, index=[2001, 2002, 2003])</p>
+                        </li>
+                        <li class="fragement">
+                            <p>frame3.index.name, frame3.columns.name, frame3.values</p>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+            <section>
+                <section data-background="#2980b9" style="color: white">
+                    <h2 style="color: white">12.3 Pandas (2)</h2>
+                </section>
+                <section>
+                    <h6>Index Objects</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [76]: obj = pd.Series(range(3), index=['a', 'b', 'c'])
+In [77]: index = obj.index
+In [78]: index
+Out[78]: Index(['a', 'b', 'c'], dtype='object')
+In [79]: index[1:]
+Out[79]: Index(['b', 'c'], dtype='object')
+</code></pre>
+                    </div>
+                    <p class="fragment">Index objects are immutable and thus can’t be modified by the user:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [80]: labels = pd.Index(np.arange(3))
+In [81]: labels
+Out[81]: Index([0, 1, 2], dtype='int64')
+In [82]: obj2 = pd.Series([1.5, -2.5, 0], index=labels)
+In [83]: obj2
+Out[83]:
+0 1.5
+1 -2.5
+2 0.0
+dtype: float64
+In [84]: obj2.index is labels
+Out[84]: True
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [85]: frame3
+Out[85]:
+state Nevada Ohio
+year
+2000 NaN 1.5
+2001 2.4 1.7
+2002 2.9 3.6
+In [86]: frame3.columns
+Out[86]: Index(['Nevada', 'Ohio'], dtype='object', name='state')
+In [87]: 'Ohio' in frame3.columns
+Out[87]: True
+In [88]: 2003 in frame3.index
+Out[88]: False
+</code></pre>
+                    </div>
+                    <p class="fragment">a pandas Index can contain duplicate labels:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [89]: dup_labels = pd.Index(['foo', 'foo', 'bar', 'bar'])
+In [90]: dup_labels
+Out[90]: Index(['foo', 'foo', 'bar', 'bar'], dtype='object')
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="1.png" style="height: 400pt"></div>
+                </section>
+                <section>
+                    <h6>Essential Functionality</h6>
+                    <p class="fragment">Reindexing</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [91]: obj = pd.Series([4.5, 7.2, -5.3, 3.6], index=['d', 'b', 'a', 'c'])
+In [92]: obj
+Out[92]:
+d 4.5
+b 7.2
+a -5.3
+c 3.6
+dtype: float64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [93]: obj2 = obj.reindex(['a', 'b', 'c', 'd', 'e'])
+In [94]: obj2
+Out[94]:
+a -5.3
+b 7.2
+c 3.6
+d 4.5
+e NaN
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">ffill</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [95]: obj3 = pd.Series(['blue', 'purple', 'yellow'], index=[0, 2, 4])
+In [96]: obj3
+Out[96]:
+0 blue
+2 purple
+4 yellow
+dtype: object
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [97]: obj3.reindex(range(6), method='ffill')
+Out[97]:
+0 blue
+1 blue
+2 purple
+3 purple
+4 yellow
+5 yellow
+dtype: object
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">With DataFrame, reindex can alter either the (row) index, columns, or both. When passed only a sequence, it reindexes the rows in the result:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [98]: frame = pd.DataFrame(np.arange(9).reshape((3, 3)),
+....: index=['a', 'c', 'd'],
+....: columns=['Ohio', 'Texas', 'California'])
+In [99]: frame
+Out[99]:
+    Ohio Texas California
+a      0     1          2
+c      3     4          5
+d      6     7          8
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [100]: frame2 = frame.reindex(['a', 'b', 'c', 'd'])
+In [101]: frame2
+Out[101]:
+    Ohio Texas California
+a    0.0   1.0        2.0
+b    NaN   NaN        NaN
+c    3.0   4.0        5.0
+d    6.0   7.0        8.0
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">The columns can be reindexed with the columns keyword:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [102]: states = ['Texas', 'Utah', 'California']
+In [103]: frame.reindex(columns=states)
+Out[103]:
+    Texas Utah California
+a       1  NaN          2
+c       4  NaN          5
+d       7  NaN          8
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [104]: frame.loc[['a', 'b', 'c', 'd'], states]
+Out[104]:
+    Texas Utah California
+a     1.0  NaN        2.0
+b     NaN  NaN        NaN
+c     4.0  NaN        5.0
+d     7.0  NaN        8.0
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h6>Dropping Entries from an Axis</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [105]: obj = pd.Series(np.arange(5.), index=['a', 'b', 'c', 'd', 'e'])
+In [106]: obj
+Out[106]:
+a 0.0
+b 1.0
+c 2.0
+d 3.0
+e 4.0
+dtype: float64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [107]: new_obj = obj.drop('c')
+In [108]: new_obj
+Out[108]:
+a 0.0
+b 1.0
+d 3.0
+e 4.0
+dtype: float64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [109]: obj.drop(['d', 'c'])
+Out[109]:
+a 0.0
+b 1.0
+e 4.0
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">
+                        With DataFrame, index values can be deleted from either axis. To illustrate this, we first create an example DataFrame:
+                    </p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [110]: data = pd.DataFrame(np.arange(16).reshape((4, 4)),
+.....: index=['Ohio', 'Colorado', 'Utah', 'New York'],
+.....: columns=['one', 'two', 'three', 'four'])
+In [111]: data
+Out[111]:
+            one two three four
+Ohio          0   1     2    3
+Colorado      4   5     6    7
+Utah          8   9    10   11
+New York     12  13    14   15
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [112]: data.drop(['Colorado', 'Ohio'])
+Out[112]:
+            one two three four
+Utah          8   9    10   11
+New York     12  13    14   15
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [113]: data.drop('two', axis=1)
+Out[113]:
+            one three four
+Ohio          0     2    3
+Colorado      4     6    7
+Utah          8    10   11
+New York     12    14   15
+
+In [114]: data.drop(['two', 'four'], axis='columns')
+Out[114]:
+            one three
+Ohio          0     2
+Colorado      4     6
+Utah          8    10
+New York     12    14
+</code></pre>
+                    </div>
+                    <ul>
+                        <li class="fragment">
+                            <p>Many functions, like drop, which modify the size or shape of a Series or DataFrame, can manipulate an object in-place without returning a new object.
+                            </p>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <h6>Indexing, Selection, and Filtering</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [117]: obj = pd.Series(np.arange(4.), index=['a', 'b', 'c', 'd'])
+In [118]: obj
+Out[118]:
+a 0.0
+b 1.0
+c 2.0
+d 3.0
+dtype: float64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [119]: obj['b']
+Out[119]: 1.0
+In [120]: obj[1]
+Out[120]: 1.0
+In [121]: obj[2:4]
+Out[121]:
+c 2.0
+d 3.0
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [122]: obj[['b', 'a', 'd']]
+Out[122]:
+b 1.0
+a 0.0
+d 3.0
+dtype: float64
+
+In [123]: obj[[1, 3]]
+Out[123]:
+b 1.0
+d 3.0
+dtype: float64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [124]: obj[obj < 2]
+Out[124]:
+a 0.0
+b 1.0
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">Slicing with labels behaves differently than normal Python slicing in that the endpoint is inclusive:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [125]: obj['b':'c']
+Out[125]:
+b 1.0
+c 2.0
+dtype: float64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [126]: obj['b':'c'] = 5
+In [127]: obj
+Out[127]:
+a 0.0
+b 5.0
+c 5.0
+d 3.0
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">Indexing into a DataFrame is for retrieving one or more columns either with a single value or sequence:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [128]: data = pd.DataFrame(np.arange(16).reshape((4, 4)),
+.....:  index=['Ohio', 'Colorado', 'Utah', 'New York'],
+.....:  columns=['one', 'two', 'three', 'four'])
+
+In [129]: data
+Out[129]:
+          one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [130]: data['two']
+Out[130]:
+Ohio         1
+Colorado     5
+Utah         9
+New York    13
+Name: two, dtype: int32
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [131]: data[['three', 'one']]
+Out[131]:
+          three  one
+Ohio          2    0
+Colorado      6    4
+Utah         10    8
+New York     14   12
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [132]: data[:2]
+Out[132]:
+          one  two  three  four
+Ohio        0    1      2     3
+Colorado    4    5      6     7
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [133]: data[data['three'] > 5]
+Out[133]:
+          one  two  three  four
+Colorado    4    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">Another use case is in indexing with a boolean DataFrame, such as one produced by a scalar comparison:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [134]: data < 5
+Out[134]:
+            one    two  three   four
+Ohio       True   True   True   True
+Colorado   True  False  False  False
+Utah      False  False  False  False
+New York  False  False  False  False
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [135]: data[data < 5] = 0
+In [136]: data
+Out[136]:
+          one  two  three  four
+Ohio        0    0      0     0
+Colorado    0    5      6     7
+Utah        8    9     10    11
+New York   12   13     14    15
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h6>Selection with loc and iloc</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [137]: data.loc['Colorado', ['two', 'three']]
+Out[137]:
+two      5
+three    6
+Name: Colorado, dtype: int32
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [138]: data.iloc[2, [3, 0, 1]]
+Out[138]:
+four    11
+one      8
+two      9
+Name: Utah, dtype: int32
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [139]: data.iloc[2]
+Out[139]:
+one       8
+two       9
+three    10
+four     11
+Name: Utah, dtype: int32
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [140]: data.iloc[[1, 2], [3, 0, 1]]
+Out[140]:
+          four  one  two
+Colorado     7    0    5
+Utah        11    8    9
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [141]: data.loc[:'Utah', 'two']
+Out[141]:
+Ohio        0
+Colorado    5
+Utah        9
+Name: two, dtype: int32
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [142]: data.iloc[:, :3][data.three > 5]
+Out[142]:
+          one  two  three
+Colorado    0    5      6
+Utah        8    9     10
+New York   12   13     14
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h6>Integer Indexes</h6>
+                    <p class="fragment">Working with pandas objects indexed by integers is something that often trips up new users due to some differences with indexing semantics on built-in Python data structures like lists and tuples.</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+import pandas as pd
+import numpy as np
+ser = pd.Series(np.arange(3.))
+print(ser)
+
+0    0.0
+1    1.0
+2    2.0
+dtype: float64
+</code></pre>
+                    </div>
+                    <p class="fragment">It’s difficult to do this in general without introducing subtle bugs. Here we have an index containing 0, 1, 2, but inferring what the user wants (label-based indexing or position-based) is difficult.</p>
+                    <p class="fragment"><b>On the other hand, with a non-integer index, there is no potential for ambiguity.</b></p>
+                </section>
+                <section>
+                    <h3>Summary: Pandas (2)</h3>
+                    <ul>
+                        <li class="fragement">
+                            <p>Pandas index objects are immutable, can contain duplicate labels</p>
+                        </li>
+                        <li class="fragement">
+                            <p>Reindex: obj.reindex, obj3.reindex(range(6), method='ffill'), frame.reindex(columns=states), obj.drop('c'), data.drop('two', axis=1)</p>
+                        </li>
+                        <li class="fragement">
+                            <p>Indexing, Selection, and Filtering: for Series, they are similar to array, <b>Slicing with labels</b>; for DataFrame, [] selects columns, and .loc and .iloc selects rows.</p>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+            <section>
+                <section data-background="#2980b9" style="color: white">
+                    <h2 style="color: white">12.4 Pandas (3)</h2>
+                </section>
+                <section>
+                    <h6>Arithmetic and Data Alignment</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [150]: s1 = pd.Series([7.3, -2.5, 3.4, 1.5], index=['a', 'c', 'd', 'e'])
+In [151]: s2 = pd.Series([-2.1, 3.6, -1.5, 4, 3.1], index=['a', 'c', 'e', 'f', 'g'])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [154]: s1 + s2
+Out[154]:
+a 5.2
+c 1.1
+d NaN
+e 0.0
+f NaN
+g NaN
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [155]: df1 = pd.DataFrame(np.arange(9.).reshape((3, 3)), columns=list('bcd'),
+.....: index=['Ohio', 'Texas', 'Colorado'])
+In [156]: df2 = pd.DataFrame(np.arange(12.).reshape((4, 3)), columns=list('bde'),
+.....: index=['Utah', 'Ohio', 'Texas', 'Oregon'])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [157]: df1
+Out[157]:
+            b    c    d
+Ohio      0.0  1.0  2.0
+Texas     3.0  4.0  5.0
+Colorado  6.0  7.0  8.0
+In [158]: df2
+Out[158]:
+          b     d     e
+Utah    0.0   1.0   2.0
+Ohio    3.0   4.0   5.0
+Texas   6.0   7.0   8.0
+Oregon  9.0  10.0  11.0
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [159]: df1 + df2
+Out[159]:
+            b   c     d   e
+Colorado  NaN NaN   NaN NaN
+Ohio      3.0 NaN   6.0 NaN
+Oregon    NaN NaN   NaN NaN
+Texas     9.0 NaN  12.0 NaN
+Utah      NaN NaN   NaN NaN
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">If you add DataFrame objects with no column or row labels in common, the result will contain all nulls:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [160]: df1 = pd.DataFrame({'A': [1, 2]})
+In [161]: df2 = pd.DataFrame({'B': [3, 4]})
+In [162]: df1
+Out[162]:
+  A
+0 1
+1 2
+In [163]: df2
+Out[163]:
+  B
+0 3
+1 4
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [164]: df1 - df2
+Out[164]:
+    A   B
+0 NaN NaN
+1 NaN NaN
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h6>Arithmetic methods with fill values</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [165]: df1 = pd.DataFrame(np.arange(12.).reshape((3, 4)),
+.....:                      columns=list('abcd'))
+In [166]: df2 = pd.DataFrame(np.arange(20.).reshape((4, 5)),
+.....:                      columns=list('abcde'))
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [167]: df2.loc[1, 'b'] = np.nan
+In [168]: df1
+Out[168]:
+     a    b     c     d
+0  0.0  1.0   2.0   3.0
+1  4.0  5.0   6.0   7.0
+2  8.0  9.0  10.0  11.0
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [169]: df2
+Out[169]:
+      a     b     c     d     e
+0   0.0   1.0   2.0   3.0   4.0
+1   5.0   NaN   7.0   8.0   9.0
+2  10.0  11.0  12.0  13.0  14.0
+3  15.0  16.0  17.0  18.0  19.0
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [170]: df1 + df2
+Out[170]:
+      a     b     c     d   e
+0   0.0   2.0   4.0   6.0 NaN
+1   9.0   NaN  13.0  15.0 NaN
+2  18.0  20.0  22.0  24.0 NaN
+3   NaN   NaN   NaN   NaN NaN
+</code></pre>
+                    </div>
+                    <p class="fragment">Using the add method on df1, I pass df2 and an argument to fill_value:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [171]: df1.add(df2, fill_value=0)
+Out[171]:
+      a     b     c     d     e
+0   0.0   2.0   4.0   6.0   4.0
+1   9.0   5.0  13.0  15.0   9.0
+2  18.0  20.0  22.0  24.0  14.0
+3  15.0  16.0  17.0  18.0  19.0
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [172]: 1 / df1
+Out[172]:
+          a         b         c         d
+0       inf  1.000000  0.500000  0.333333
+1  0.250000  0.200000  0.166667  0.142857
+2  0.125000  0.111111  0.100000  0.090909
+
+In [173]: df1.rdiv(1)
+Out[173]:
+          a         b         c         d
+0       inf  1.000000  0.500000  0.333333
+1  0.250000  0.200000  0.166667  0.142857
+2  0.125000  0.111111  0.100000  0.090909
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [174]: df1.reindex(columns=df2.columns, fill_value=0)
+Out[174]:
+     a    b     c     d  e
+0  0.0  1.0   2.0   3.0  0
+1  4.0  5.0   6.0   7.0  0
+2  8.0  9.0  10.0  11.0  0
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="2.png" style="height: 400pt"></div>
+                </section>
+                <section>
+                    <p class="fragment">Operations between DataFrame and Series</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [175]: arr = np.arange(12.).reshape((3, 4))
+In [176]: arr
+Out[176]:
+array([[  0.,   1.,   2.,   3.],
+       [  4.,   5.,   6.,   7.],
+       [  8.,   9.,  10.,  11.]])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [177]: arr[0]
+Out[177]: array([ 0., 1., 2., 3.])
+In [178]: arr - arr[0]
+Out[178]:
+array([[ 0.,  0.,  0.,  0.],
+       [ 4.,  4.,  4.,  4.],
+       [ 8.,  8.,  8.,  8.]])
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragement">Operations between a DataFrame and a Series are similar:
+                    </p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [179]: frame = pd.DataFrame(np.arange(12.).reshape((4, 3)),
+.....: columns=list('bde'),
+.....: index=['Utah', 'Ohio', 'Texas', 'Oregon'])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [180]: series = frame.iloc[0]
+In [181]: frame
+Out[181]:
+          b     d     e
+Utah    0.0   1.0   2.0
+Ohio    3.0   4.0   5.0
+Texas   6.0   7.0   8.0
+Oregon  9.0  10.0  11.0
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [182]: series
+Out[182]:
+b 0.0
+d 1.0
+e 2.0
+Name: Utah, dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">By default, arithmetic between DataFrame and Series matches the index of the Series on the DataFrame’s columns, broadcasting down the rows:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [183]: frame - series
+Out[183]:
+          b    d    e
+Utah    0.0  0.0  0.0
+Ohio    3.0  3.0  3.0
+Texas   6.0  6.0  6.0
+Oregon  9.0  9.0  9.0
+</code></pre>
+                    </div>
+                    <p class="fragment">If an index value is not found in either the DataFrame’s columns or the Series’s index, the objects will be reindexed to form the union:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [184]: series2 = pd.Series(range(3), index=['b', 'e', 'f'])
+In [185]: frame + series2
+Out[185]:
+          b   d     e   f
+Utah    0.0 NaN   3.0 NaN
+Ohio    3.0 NaN   6.0 NaN
+Texas   6.0 NaN   9.0 NaN
+Oregon  9.0 NaN  12.0 NaN
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">If you want to instead broadcast over the columns, matching on the rows, you have to use one of the arithmetic methods. For example:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [186]: series3 = frame['d']
+In [187]: frame
+Out[187]:
+          b     d     e
+Utah    0.0   1.0   2.0
+Ohio    3.0   4.0   5.0
+Texas   6.0   7.0   8.0
+Oregon  9.0  10.0  11.0
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [188]: series3
+Out[188]:
+Utah       1.0
+Ohio       4.0
+Texas      7.0
+Oregon    10.0
+Name: d, dtype: float64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [189]: frame.sub(series3, axis='index') #(axis='index' or axis=0)
+Out[189]: 
+          b    d    e
+Utah   -1.0  0.0  1.0
+Ohio   -1.0  0.0  1.0
+Texas  -1.0  0.0  1.0
+Oregon -1.0  0.0  1.0
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h6>Function Application and Mapping</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [190]: frame = pd.DataFrame(np.random.randn(4, 3), columns=list('bde'),
+.....: index=['Utah', 'Ohio', 'Texas', 'Oregon'])
+
+In [191]: frame
+Out[191]:
+               b         d         e
+Utah    0.228056 -0.765553 -1.089593
+Ohio   -0.119008 -1.774919  1.194265
+Texas   0.016056 -0.341004  0.588025
+Oregon -0.044519 -0.129478 -0.148802
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [192]: np.abs(frame)
+Out[192]:
+               b         d         e
+Utah    0.228056  0.765553  1.089593
+Ohio    0.119008  1.774919  1.194265
+Texas   0.016056  0.341004  0.588025
+Oregon  0.044519  0.129478  0.148802
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">Another frequent operation is applying a function on one-dimensional arrays to each column or row. DataFrame’s <b>apply</b> method does exactly this:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [193]: f = lambda x: x.max() - x.min()
+In [194]: frame.apply(f)
+Out[194]:
+b    3.183504
+d    2.418438
+e    2.365567
+dtype: float64
+</code></pre>
+                    </div>
+                    <p class="fragment">If you pass axis='columns' to apply, the function will be invoked once per row instead:
+                    </p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [195]: frame.apply(f, axis='columns')
+Out[195]:
+Utah      0.759014
+Ohio      1.994896
+Texas     1.748465
+Oregon    2.390954
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">The function passed to apply need not return a scalar value; it can also return a Series with multiple values:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [196]: def f(x):
+.....: return pd.Series([x.min(), x.max()], index=['min', 'max'])
+In [197]: frame.apply(f)
+Out[197]:
+            b         d         e
+min -1.076530 -0.442564 -1.674224
+max  0.871809  1.596725  0.955903
+</code></pre>
+                    </div>
+                    <p class="fragment">Element-wise Python functions can be used, too. Suppose you wanted to compute a formatted string from each floating-point value in frame. You can do this with <b>apply map</b>:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [198]: format = lambda x: '%.2f' % x
+In [199]: frame.applymap(format)
+Out[199]:
+            b      d      e
+Utah    -0.16  -1.40  -1.33
+Ohio    -0.71   0.85   0.31
+Texas   -0.54   0.46  -1.07
+Oregon   0.12   1.52  -1.14
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h6>Sorting and Ranking</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [201]: obj = pd.Series(range(4), index=['d', 'a', 'b', 'c'])
+In [202]: obj.sort_index() #sort_index method
+Out[202]:
+a 1
+b 2
+c 3
+d 0
+dtype: int64
+</code></pre>
+                    </div>
+                    <p class="fragment">With a DataFrame, you can sort by index on either axis:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [203]: frame = pd.DataFrame(np.arange(8).reshape((2, 4)),
+.....: index=['three', 'one'],
+.....: columns=['d', 'a', 'b', 'c'])
+In [204]: frame.sort_index()
+
+Out[204]:
+       d  a  b  c
+one    4  5  6  7
+three  0  1  2  3
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [205]: frame.sort_index(axis=1)
+Out[205]:
+       a  b  c  d
+three  1  2  3  0
+one    5  6  7  4
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">
+                        The data is sorted in ascending order by default, but can be sorted in descending order, too:
+                    </p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [206]: frame.sort_index(axis=1, ascending=False)
+Out[206]:
+       d  c  b  a
+three  0  3  2  1
+one    4  7  6  5
+</code></pre>
+                    </div>
+                    <p class="fragment">To sort a Series by its values, use its sort_values method:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [207]: obj = pd.Series([4, 7, -3, 2])
+In [208]: obj.sort_values()
+Out[208]:
+2 -3
+3 2
+0 4
+1 7
+dtype: int64
+</code></pre>
+                    </div>
+                    <p class="fragment">Any missing values are sorted to the end of the Series by default.</p>
+                </section>
+                <section>
+                    <p class="fragment">When sorting a DataFrame, you can use the data in one or more columns as the sort keys. To do so, pass one or more column names to the by option of sort_values:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [211]: frame = pd.DataFrame({'b': [4, 7, -3, 2], 'a': [0, 1, 0, 1]})
+In [212]: frame
+Out[212]:
+   b  a
+0  4  0
+1  7  1
+2 -3  0
+3  2  1
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [213]: frame.sort_values(by='b')
+Out[213]:
+   b  a
+2 -3  0
+3  2  1
+0  4  0
+1  7  1
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [214]: frame.sort_values(by=['a', 'b'])
+Out[214]:
+   b  a
+2 -3  0
+0  4  0
+3  2  1
+1  7  1
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">Rank</p>
+                    <p class="fragment">By default rank breaks ties by assigning each group the mean rank:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [215]: obj = pd.Series([7, -5, 7, 4, 2, 0, 4])
+In [216]: obj.rank()
+Out[216]:
+0 6.5
+1 1.0
+2 6.5
+3 4.5
+4 3.0
+5 2.0
+6 4.5
+dtype: float64
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [217]: obj.rank(method='first')
+Out[217]:
+0 6.0
+1 1.0
+2 7.0
+3 4.0
+4 3.0
+5 2.0
+6 5.0
+dtype: float64
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">DataFrame can compute ranks over the rows or the columns:</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [219]: frame = pd.DataFrame({'b': [4.3, 7, -3, 2], 'a': [0, 1, 0, 1],
+.....: 'c': [-2, 5, 8, -2.5]})
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [220]: frame
+Out[220]:
+     b  a    c
+0  4.3  0 -2.0
+1  7.0  1  5.0
+2 -3.0  0  8.0
+3  2.0  1 -2.5
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+In [221]: frame.rank(axis='columns')
+Out[221]:
+     b    a    c
+0  3.0  2.0  1.0
+1  3.0  1.0  2.0
+2  1.0  2.0  3.0
+3  3.0  2.0  1.0
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h3>Summary: Pandas (3)</h3>
+                    <ul>
+                        <li class="fragement">
+                            <p>Arithmetic and Data Alignment</p>
+                        </li>
+                        <li class="fragement">
+                            <p>Arithmetic methods with fill values</p>
+                        </li>
+                        <li class="fragement">
+                            <p>Function Application and Mapping: .apply, .applymap</p>
+                        </li>
+                        <li class="fragement">
+                            <p>Sorting and Ranking: .sort_index, .sort_values(), .rank()</p>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+            <section>
+                <section data-background="#2c3e50" style="color: white; text-align: left;">
+                    <h2 style="color: white">Summary</h2>
+                    <ul>
+                        <li>Numpy</li>
+                        <ul>
+                            <li>Reading: Python for Data Analysis, Chapter 5</li>
+                        </ul>
+                    </ul>
+                </section>
+            </section>
+        </div>
+    </div>
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+    <script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 960,
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // Bounds for smallest/largest possible scale to apply to content
+        minScale: 0.2,
+        maxScale: 1.5,
+
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Set default timing of 2 minutes per slide
+        defaultTiming: 120,
+
+        // Display the page number of the current slide
+        slideNumber: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autolaying embedded media (video/audio/iframe)
+        // - null: Media will only autoplay if data-autoplay is present
+        // - true: All media will autoplay, regardless of individual setting
+        // - false: No media will autoplay, regardless of individual setting
+        autoPlayMedia: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: Reveal.navigateNext,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // Hides the address bar on mobile devices
+        hideAddressBar: true,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // Transition speed
+        transitionSpeed: 'default', // default/fast/slow
+
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'fade', // none/fade/slide/convex/concave/zoom
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Parallax background image
+        parallaxBackgroundImage: '', // e.g. "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'"
+
+        // Parallax background size
+        parallaxBackgroundSize: '', // CSS syntax, e.g. "2100px 900px"
+
+        // Number of pixels to move the parallax background per slide
+        // - Calculated automatically unless specified
+        // - Set to 0 to disable movement along an axis
+        parallaxBackgroundHorizontal: null,
+        parallaxBackgroundVertical: null,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        dependencies: [
+            { src: 'plugin/markdown/marked.js' },
+            { src: 'plugin/markdown/markdown.js' },
+            { src: 'plugin/notes/notes.js', async: true },
+            { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+            // Zoom in and out with Alt+click
+            { src: 'plugin/zoom-js/zoom.js', async: true },
+
+            // Speaker notes
+            { src: 'plugin/notes/notes.js', async: true },
+
+            // MathJax
+            { src: 'plugin/math/math.js', async: true },
+            { src: 'plugin/line-numbers/line-numbers.js' }
+        ]
+    });
+    </script>
+</body>
+
+</html>
