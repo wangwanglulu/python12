@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/theme/white.css">
     <link rel="stylesheet" href="css/theme/custom.css">
     <!-- Theme used for syntax highlighting of code -->
-    <link rel="stylesheet" href="lib/css/zenburn.css">
+    <link rel="stylesheet" href="lib/css/github-gist.css">
     <!-- Printing and PDF exports -->
     <script>
     var link = document.createElement('link');
@@ -25,863 +25,590 @@
         <div class="slides">
             <section data-background-video="bgm.mp4" data-background-video-loop data-background-video-muted style="text-align: left;">
                 <h2 style="color: white">Python Programming</h2>
-                <h5 style="color: white">Lecture 12 Numpy, Pandas Basics</h5>
+                <h5 style="color: white">Lecture 12 Downloading Data, API</h5>
             </section>
             <section>
                 <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">12.1 NumPy (3)</h2>
+                    <h2 style="color: white">12.1 Downloading Data (2)</h2>
                 </section>
                 <section>
-                    <ul>
-                        <li class="fragment">
-                            <p>Mathematical and Statistical Methods</p>
-                        </li>
-                    </ul>
+                    <p><b>.JSON</b></p>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [177]: arr = np.random.randn(5, 4)
-In [178]: arr
-Out[178]:
-array([[ 2.1695, -0.1149, 2.0037, 0.0296],
-[ 0.7953, 0.1181, -0.7485, 0.585 ],
-[ 0.1527, -1.5657, -0.5625, -0.0327],
-[-0.929 , -0.4826, -0.0363, 1.0954],
-[ 0.9809, -0.5895, 1.5817, -0.5287]])
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
 
-In [179]: arr.mean()
-Out[179]: 0.19607051119998253
-In [180]: np.mean(arr)
-Out[180]: 0.19607051119998253
-In [181]: arr.sum()
-Out[181]: 3.9214102239996507
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [182]: arr.mean(axis=1)
-Out[182]: array([ 1.022 , 0.1875, -0.502 , -0.0881, 0.3611])
-In [183]: arr.sum(axis=0)
-Out[183]: array([ 3.1693, -2.6345, 2.2381, 1.1486])
-</code></pre>
-                    </div>
-                    <p class="fragment">Here, arr.mean(1) means “compute mean across the columns” where arr.sum(0) means “compute sum down the rows.”</p>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [184]: arr = np.array([0, 1, 2, 3, 4, 5, 6, 7])
-In [185]: arr.cumsum()
-Out[185]: array([ 0, 1, 3, 6, 10, 15, 21, 28])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [186]: arr = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
-In [187]: arr
-Out[187]:
-array([[0, 1, 2],
-[3, 4, 5],
-[6, 7, 8]])
+import json
 
-In [188]: arr.cumsum(axis=0)
-Out[188]:
-array([[ 0, 1, 2],
-[ 3, 5, 7],
-[ 9, 12, 15]])
+filename = 'btc_close_2017.json'
+with open(filename) as f:
+    btc_data = json.load(f)  
 
-In [189]: arr.cumprod(axis=1)
-Out[189]:
-array([[ 0, 0, 0],
-[ 3, 12, 60],
-[ 6, 42, 336]])
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <ul>
-                        <li class="fragment">
-                            <p>Sorting</p>
-                        </li>
-                    </ul>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [195]: arr = np.random.randn(6)
-In [196]: arr
-Out[196]: array([ 0.6095, -0.4938, 1.24 , -0.1357, 1.43 , -0.8469])
-In [197]: arr.sort()
-In [198]: arr
-Out[198]: array([-0.8469, -0.4938, -0.1357, 0.6095, 1.24 , 1.43 ])
+for btc_dict in btc_data:
+    date = btc_dict['date']
+    month = int(btc_dict['month'])
+    week = int(btc_dict['week'])
+    weekday = btc_dict['weekday']
+    close = int(float(btc_dict['close']))  
+    print("{} is month {} week {}, {}, the close price is {} RMB".format(
+        date, month, week, weekday, close))
 </code></pre>
                     </div>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [199]: arr = np.random.randn(5, 3)
-In [200]: arr
-Out[200]:
-array([[ 0.6033, 1.2636, -0.2555],
-[-0.4457, 0.4684, -0.9616],
-[-1.8245, 0.6254, 1.0229],
-[ 1.1074, 0.0909, -0.3501],
-[ 0.218 , -0.8948, -1.7415]])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [201]: arr.sort(1)
-In [202]: arr
-Out[202]:
-array([[-0.2555, 0.6033, 1.2636],
-[-0.9616, -0.4457, 0.4684],
-[-1.8245, 0.6254, 1.0229],
-[-0.3501, 0.0909, 1.1074],
-[-1.7415, -0.8948, 0.218 ]])
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+2017-01-01 is month 1 week 52, Sunday, the close price is 6928 RMB
+2017-01-02 is month 1 week 1, Monday, the close price is 7070 RMB
+2017-01-03 is month 1 week 1, Tuesday, the close price is 7175 RMB
+2017-01-04 is month 1 week 1, Wednesday, the close price is 7835 RMB
+2017-01-05 is month 1 week 1, Thursday, the close price is 6928 RMB
+...
 </code></pre>
                     </div>
                 </section>
                 <section>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [203]: large_arr = np.random.randn(1000)
-In [204]: large_arr.sort()
-In [205]: large_arr[int(0.05 * len(large_arr))] # 5% quantile
-Out[205]: -1.5311513550102103
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+
+
+line_chart = pygal.Line(x_label_rotation=20, show_minor_x_labels=False) 
+line_chart.title = '收盘价（¥）'
+line_chart.x_labels = dates
+N = 20  # X-axis shows the date for every 20 days 
+line_chart.x_labels_major = dates[::N]
+line_chart.add('收盘价', close)
+line_chart.render_to_file('收盘价折线图（¥）.svg')
 </code></pre>
                     </div>
-                    <ul>
-                        <li class="fragment">
-                            <p>Unique</p>
-                        </li>
-                    </ul>
+                    <div class="fragment"><img data-src="close_price.svg" style="height: 350pt"></div>
+                </section>
+                <section>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [206]: names = np.array(['Bob', 'Joe', 'Will', 'Bob', 'Will', 'Joe', 'Joe'])
-In [207]: np.unique(names)
-Out[207]:
-array(['Bob', 'Joe', 'Will'],
-dtype='&lt;U4')
-In [208]: ints = np.array([3, 3, 3, 2, 2, 1, 1, 4, 4])
-In [209]: np.unique(ints)
-Out[209]: array([1, 2, 3, 4])
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+line_chart = pygal.Line(x_label_rotation=20, show_minor_x_labels=False)
+line_chart.title = '收盘价对数变换（¥）'
+line_chart.x_labels = dates
+N = 20
+line_chart.x_labels_major = dates[::N]
+<mark>close_log = [math.log10(xx) for xx in close]</mark>
+<mark>line_chart.add('log收盘价', close_log)</mark>
+line_chart.render_to_file('收盘价对数变换折线图（¥）.svg')
+</code></pre>
+                    </div>
+                    <div class="fragment"><img data-src="close_price_log.svg" style="height: 350pt"></div>
+                </section>
+                <section>
+                    <p><b>itertools</b></p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+import itertools
+
+nums = itertools.count(0,2)
+for i in nums:
+    if i > 6:
+        break
+    print(i, end = " ")
+#output
+0 2 4 6 
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+import itertools
+
+cycle_strings = itertools.cycle('ABC')
+i = 1
+for string in cycle_strings:
+    if i == 7:
+        break
+    print(i, string)
+    i += 1
+#output
+1 A
+2 B
+3 C
+4 A
+5 B
+6 C
 </code></pre>
                     </div>
                 </section>
                 <section>
                     <ul>
                         <li class="fragment">
-                            <p>File Input and Output with Arrays</p>
+                            <p>We have learned <b>generator</b>.(next(), for)</p>
+                        </li>
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+g = (x * x for x in range(10))
+
+def fib(max):
+    n, a, b = 0, 0, 1
+    while n < max:
+        yield b
+        a, b = b, a + b
+        n = n + 1
+    return 'done'
+</code></pre>
+                        </div>
+                        <li class="fragment">
+                            <p><b>Iterator</b> is a more general concept: any object whose class has a next method (__next__ in Python 3) and an __iter__ method.</p>
                         </li>
                         <li class="fragment">
-                            <p>np.save and np.load are the two workhorse functions for efficiently saving and loading array data on disk. Arrays are saved by default in an uncompressed raw binary format with file extension .npy:</p>
+                            <p>Every generator is an iterator, but not vice versa.</p>
                         </li>
-                    </ul>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [213]: arr = np.arange(10)
-In [214]: np.save('some_array', arr)
-
-In [215]: np.load('some_array.npy')
-Out[215]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-</code></pre>
-                    </div>
-                    <ul>
                         <li class="fragment">
-                            <p>You save multiple arrays in an uncompressed archive using np.savez and passing the arrays as keyword arguments:</p>
+                            <p><b>An iterator can only be traversed once.</b></p>
                         </li>
-                    </ul>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [216]: np.savez('array_archive.npz', a=arr, b=arr)
-
-In [217]: arch = np.load('array_archive.npz') #Dictionary
-In [218]: arch['b']
-Out[218]: array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-
-In [219]: np.savez_compressed('arrays_compressed.npz', a=arr, b=arr)
-In [216]: np.savetxt('array_archive.txt', arr)
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <ul>
                         <li class="fragment">
-                            <p>Linear Algebra</p>
+                            <p>Iterator and iterable are two different concepts</p>
                         </li>
                     </ul>
+                </section>
+                <section>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [223]: x = np.array([[1., 2., 3.], [4., 5., 6.]])
-In [224]: y = np.array([[6., 23.], [-1, 7], [8, 9]])
-In [225]: x
-Out[225]:
-array([[ 1., 2., 3.],
-[ 4., 5., 6.]])
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+import itertools
 
-In [226]: y
-Out[226]:
-array([[ 6., 23.],
-[ -1., 7.],
-[ 8., 9.]])
+for item in itertools.repeat('hello world', 3):
+    print(item)
+
+hello world
+hello world
+hello world
 </code></pre>
                     </div>
+                    <p class="fragment"><b>groupby()</b></p>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [227]: x.dot(y)
-Out[227]:
-array([[ 28., 64.],
-[ 67., 181.]])
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from itertools import groupby
 
-In [228]: np.dot(x, y)
-Out[228]:
-array([[ 28., 64.],
-[ 67., 181.]])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [229]: np.dot(x, np.ones(3))
-Out[229]: array([ 6., 15.])
+for key, value_iter in groupby('aaabbbaaccd'):
+    print(key, ':', list(value_iter))
 
-In [230]: x @ np.ones(3)
-Out[230]: array([ 6., 15.])
+a : ['a', 'a', 'a']
+b : ['b', 'b', 'b']
+a : ['a', 'a']
+c : ['c', 'c']
+d : ['d']
 </code></pre>
                     </div>
                 </section>
                 <section>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [231]: from numpy.linalg import inv, qr
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from itertools import groupby
 
-In [232]: X = np.random.randn(5, 5)
+data = ['a', 'bb', 'ccc', 'dd', 'eee', 'f']
+for key, value_iter in groupby(data, len):  
+    print(key, ':', list(value_iter))
 
-In [233]: mat = X.T.dot(X)
-
-In [234]: inv(mat)
-Out[234]:
-array([[ 933.1189, 871.8258, -1417.6902, -1460.4005, 1782.1391],
-[ 871.8258, 815.3929, -1325.9965, -1365.9242, 1666.9347],
-[-1417.6902, -1325.9965, 2158.4424, 2222.0191, -2711.6822],
-[-1460.4005, -1365.9242, 2222.0191, 2289.0575, -2793.422 ],
-[ 1782.1391, 1666.9347, -2711.6822, -2793.422 , 3409.5128]])
+1 : ['a']
+2 : ['bb']
+3 : ['ccc']
+2 : ['dd']
+3 : ['eee']
+1 : ['f']
 </code></pre>
                     </div>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [235]: mat.dot(inv(mat))
-Out[235]:
-array([[ 1., 0., -0., -0., -0.],
-[-0., 1., 0., 0., 0.],
-[ 0., 0., 1., 0., 0.],
-[-0., 0., 0., 1., -0.],
-[-0., 0., 0., 0., 1.]])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [236]: q, r = qr(mat)
-In [237]: r
-Out[237]:
-array([[-1.6914, 4.38 , 0.1757, 0.4075, -0.7838],
-[ 0. , -2.6436, 0.1939, -3.072 , -1.0702],
-[ 0. , 0. , -0.8138, 1.5414, 0.6155],
-[ 0. , 0. , 0. , -2.6445, -2.1669],
-[ 0. , 0. , 0. , 0. , 0.0002]])
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from itertools import groupby
+
+data = ['a', 'bb', 'cc', 'ddd', 'eee', 'f']
+for key, value_iter in groupby(data, len):  
+    print(key, ':', list(value_iter))
+
+1 : ['a']
+2 : ['bb', 'cc']
+3 : ['ddd', 'eee']
+1 : ['f']
 </code></pre>
                     </div>
                 </section>
                 <section>
-                    <div class="fragment"><img data-src="F1.png" style="height: 150pt"></div>
-                    <div class="fragment"><img data-src="F2.png" style="height: 200pt"></div>
-                </section>
-                <section>
-                    <ul>
-                        <li class="fragment">
-                            <p>Pseudorandom Number Generation</p>
-                        </li>
-                    </ul>
+                    <p><b>zip()</b></p>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [238]: samples = np.random.normal(size=(4, 4))
-In [239]: samples
-Out[239]:
-array([[ 0.5732, 0.1933, 0.4429, 1.2796],
-[ 0.575 , 0.4339, -0.7658, -1.237 ],
-[-0.5367, 1.8545, -0.92 , -0.1082],
-[ 0.1525, 0.9435, -1.0953, -0.144 ]])
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+>>> a = [1,2,3]
+>>> b = [4,5,6]
+>>> c = [4,5,6,7,8]
+>>> zipped = zip(a,b)
+>>> zipped
+<zip object at 0x02B01B48> #返回的是一个对象(iterator)
+>>> list(zipped)
+[(1, 4), (2, 5), (3, 6)] #使用list()函数转换为列表
+>>> list(zip(a,c))
+[(1, 4), (2, 5), (3, 6)]
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+>>> a = [1,2,3]
+>>> b = [4,5,6]
+>>> c = [4,5,6,7,8]
+>>> zipped = zip(a,b)
+>>> list(zip(*zipped)) #解压也使用list进行转换
+[(1, 2, 3), (4, 5, 6)]
+>>> zipped = zip(a,b)
+>>> x,y = zip(*zipped)
+>>> print(x)
+(1,2,3)
 </code></pre>
                     </div>
                 </section>
                 <section>
-                    <h3>Summary: Numpy (3)</h3>
-                    <ul>
-                        <li class="fragement">
-                            <p>Maths and Stats methods: arr.mean()(arr.mean(axis=1)), arr.sum(), arr.cumsum(), arr.cumprod(), arr.sort(), np.unique()</p>
-                        </li>
-                        <li class="fragement">
-                            <p>File Input and Output: np.save('some_array', arr), np.load('some_array.npy'), np.savez('array_archive.npz', a=arr, b=arr), np.savez_compressed('arrays_compressed.npz', a=arr, b=arr), np.savetxt('array_archive.txt', arr)
-                            </p>
-                        </li>
-                        <li class="fragement">
-                            <p>Linear Algebra: .dot (@), inv(), qr(), diag(), det(), trace, eig, solve, lstsq</p>
-                        </li>
-                        <li class="fragement">
-                            <p>Random: np.random.normal(size=(4,4)) </p>
-                        </li>
-                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from itertools import groupby
+
+def draw_line(x_data, y_data, title, y_legend):
+    xy_map = []
+    <mark>for x, y in groupby(sorted(zip(x_data, y_data)), key=lambda _: _[0]):</mark>  
+        y_list = [v for _, v in y]
+        xy_map.append([x, sum(y_list) / len(y_list)])  
+    x_unique, y_mean = zip(*xy_map) # [*zip(*xy_map)] 
+    line_chart = pygal.Line()
+    line_chart.title = title
+    line_chart.x_labels = x_unique
+    line_chart.add(y_legend, y_mean)
+    line_chart.render_to_file(title + '.svg')
+    return line_chart
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+idx_month = dates.index('2017-12-01') #list.index()
+line_chart_month = draw_line(
+    months[:idx_month], close[:idx_month], '收盘价月日均值（¥）', '月日均值')
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="close_price_avg.svg" style="height: 400pt"></div>
                 </section>
             </section>
             <section>
                 <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">12.2 Pandas (1)</h2>
+                    <h2 style="color: white">12.2 API</h2>
+                </section>
+                <section>
+                    <p>GitHub</p>
+                    <p><a href="https://api.github.com/search/repositories?q=language:python&sort=stars">https://api.github.com/search/repositories?q=language:python&sort=stars</a></p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+url = 'https://api.github.com/search/repositories?q=language:python&sort=stars'
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+import requests
+
+# Make an API call and store the response.
+r = requests.get(url)
+print("Status code:", r.status_code)
+# Store API response in a variable.
+response_dict = r.json()
+
+print(response_dict.keys())
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+Status code: 200
+dict_keys(['total_count', 'incomplete_results', 'items'])
+</code></pre>
+                    </div>
                 </section>
                 <section>
                     <ul>
-                        <li class="fragment">
-                            <p>Pandas is designed for working with tabular or heterogeneous data. It contains data structures and data manipulation tools designed to make data cleaning and analysis fast and easy in Python.</p>
-                        </li>
+                        <li>Working with the Response Dictionary</li>
                     </ul>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [1]: import pandas as pd
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>Introduction to pandas Data Structures</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [11]: obj = pd.Series([4, 7, -5, 3])
-In [12]: obj
-Out[12]:
-0 4
-1 7
-2 -5
-3 3
-dtype: int64
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+import requests
+url = 'https://api.github.com/search/repositories?q=language:python&sort=stars'
+# Make an API call and store the response.
+r = requests.get(url)
+print("Status code:", r.status_code)
+# Store API response in a variable.
+response_dict = r.json()
 </code></pre>
                     </div>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [13]: obj.values
-Out[13]: array([ 4, 7, -5, 3])
-In [14]: obj.index # like range(4)
-Out[14]: RangeIndex(start=0, stop=4, step=1)
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">Often it will be desirable to create a Series with an index identifying each data point with a label:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [15]: obj2 = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
-In [16]: obj2
-Out[16]:
-d 4
-b 7
-a -5
-c 3
-dtype: int64
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+print("Total repositories:", response_dict['total_count'])
+# Explore information about the repositories.
+repo_dicts = response_dict['items']
+print("Repositories returned:", len(repo_dicts))
 
-In [17]: obj2.index
-Out[17]: Index(['d', 'b', 'a', 'c'], dtype='object')
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [18]: obj2['a']
-Out[18]: -5
-In [19]: obj2['d'] = 6
-In [20]: obj2[['c', 'a', 'd']]
-Out[20]:
-c 3
-a -5
-d 6
-dtype: int64
-</code></pre>
-                    </div>
-                    <p class="fragment">Here ['c', 'a', 'd'] is interpreted as a list of indices, even though it contains strings instead of integers.</p>
-                </section>
-                <section>
-                    <h6 class="fragment">Filtering with boolean array</h6>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [21]: obj2[obj2 > 0]
-Out[21]:
-d 6
-b 7
-c 3
-dtype: int64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [22]: obj2 * 2
-Out[22]:
-d 12
-b 14
-a -10
-c 6
-dtype: int64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [23]: np.exp(obj2)
-Out[23]:
-d 403.428793
-b 1096.633158
-a 0.006738
-c 20.085537
-dtype: float64
-</code></pre>
-                    </div>
-                    <p class="fragment">Another way to think about a Series is as a fixed-length, <b>ordered</b> dict, as it is a mapping of index values to data values.</p>
-                </section>
-                <section>
-                    <p class="fragment">Should you have data contained in a Python dict, you can create a Series from it by passing the dict:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [26]: sdata = {'Ohio': 35000, 'Texas': 71000, 'Oregon': 16000, 'Utah': 5000}
-In [27]: obj3 = pd.Series(sdata)
-In [28]: obj3
-Out[28]:
-Ohio 35000
-Oregon 16000
-Texas 71000
-Utah 5000
-dtype: int64
-</code></pre>
-                    </div>
-                    <p class="fragment">When you are only passing a dict, the index in the resulting Series will have the dict’s keys in sorted order. You can override this by passing the dict keys in the order you want them to appear in the resulting Series:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [29]: states = ['California', 'Ohio', 'Oregon', 'Texas']
-In [30]: obj4 = pd.Series(sdata, index=states)
-In [31]: obj4
-Out[31]:
-California NaN
-Ohio 35000.0
-Oregon 16000.0
-Texas 71000.0
-dtype: float64
+# Examine the first repository.
+repo_dict = repo_dicts[0]
+print("\nKeys:", len(repo_dict))
+for key in sorted(repo_dict.keys()):
+    print(key)
 </code></pre>
                     </div>
                 </section>
                 <section>
-                    <p class="fragment">The isnull and notnull functions in pandas should be used to detect missing data:</p>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [32]: pd.isnull(obj4)
-Out[32]:
-California True
-Ohio False
-Oregon False
-Texas False
-dtype: bool
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+print("\nSelected information about first repository:")
+print('Name:', repo_dict['name'])
+print('Owner:', repo_dict['owner']['login'])
+print('Stars:', repo_dict['stargazers_count'])
+print('Repository:', repo_dict['html_url'])
+print('Created:', repo_dict['created_at'])
+print('Updated:', repo_dict['updated_at'])
+print('Description:', repo_dict['description'])
 </code></pre>
                     </div>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [33]: pd.notnull(obj4)
-Out[33]:
-California False
-Ohio True
-Oregon True
-Texas True
-dtype: bool
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [34]: obj4.isnull()
-Out[34]:
-California True
-Ohio False
-Oregon False
-Texas False
-dtype: bool
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">A useful Series feature for many applications is that it automatically aligns by index label in arithmetic operations:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [35]: obj3
-Out[35]:
-Ohio 35000
-Oregon 16000
-Texas 71000
-Utah 5000
-dtype: int64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [36]: obj4
-Out[36]:
-California NaN
-Ohio 35000.0
-Oregon 16000.0
-Texas 71000.0
-dtype: float64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [37]: obj3 + obj4
-Out[37]:
-California NaN
-Ohio 70000.0
-Oregon 32000.0
-Texas 142000.0
-Utah NaN
-dtype: float64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">Both the Series object itself and its index have a name attribute, which integrates with other key areas of pandas functionality:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [38]: obj4.name = 'population'
-In [39]: obj4.index.name = 'state'
-In [40]: obj4
-Out[40]:
-state
-California NaN
-Ohio 35000.0
-Oregon 16000.0
-Texas 71000.0
-Name: population, dtype: float64
-</code></pre>
-                    </div>
-                    <p class="fragment">A Series’s index can be altered in-place by assignment:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [41]: obj
-Out[41]:
-0 4
-1 7
-2 -5
-3 3
-dtype: int64
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [42]: obj.index = ['Bob', 'Steve', 'Jeff', 'Ryan']
-In [43]: obj
-Out[43]:
-Bob 4
-Steve 7
-Jeff -5
-Ryan 3
-dtype: int64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h6>DataFrame</h6>
-                    <p class="fragment">A DataFrame represents a rectangular table of data and contains an ordered collection of columns, each of which can be a different value type (numeric, string, boolean, etc.).</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
-'year': [2000, 2001, 2002, 2001, 2002, 2003],
-'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
-frame = pd.DataFrame(data)
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [45]: frame
-Out[45]:
-  pop state year
-0 1.5 Ohio 2000
-1 1.7 Ohio 2001
-2 3.6 Ohio 2002
-3 2.4 Nevada 2001
-4 2.9 Nevada 2002
-5 3.2 Nevada 2003
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">For large DataFrames, the head method selects only the first five rows:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [46]: frame.head()
-Out[46]:
-  pop state year
-0 1.5 Ohio 2000
-1 1.7 Ohio 2001
-2 3.6 Ohio 2002
-3 2.4 Nevada 2001
-4 2.9 Nevada 2002
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [47]: pd.DataFrame(data, columns=['year', 'state', 'pop'])
-Out[47]:
-  year state pop
-0 2000 Ohio 1.5
-1 2001 Ohio 1.7
-2 2002 Ohio 3.6
-3 2001 Nevada 2.4
-4 2002 Nevada 2.9
-5 2003 Nevada 3.2
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">If you pass a column that isn’t contained in the dict, it will appear with missing values in the result:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [48]: frame2 = pd.DataFrame(data, columns=['year', 'state', 'pop', 'debt'],
-....: index=['one', 'two', 'three', 'four',
-....: 'five', 'six'])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [49]: frame2
-Out[49]:
-    year state pop debt
-one 2000 Ohio 1.5 NaN
-two 2001 Ohio 1.7 NaN
-three 2002 Ohio 3.6 NaN
-four 2001 Nevada 2.4 NaN
-five 2002 Nevada 2.9 NaN
-six 2003 Nevada 3.2 NaN
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+Status code: 200
+Total repositories: 3675320
+Repositories returned: 30
 
-In [50]: frame2.columns
-Out[50]: Index(['year', 'state', 'pop', 'debt'], dtype='object')
+Selected information about first repository:
+Name: public-apis
+Owner: toddmotto
+Stars: 57212
+Repository: https://github.com/toddmotto/public-apis
+Created: 2016-03-20T23:49:42Z
+Updated: 2019-05-22T09:34:50Z
+Description: A collective list of free APIs for use in software and web development.
 </code></pre>
                     </div>
                 </section>
                 <section>
-                    <p class="fragment">
-                        A column in a DataFrame can be retrieved as a Series either by dict-like notation or by attribute:
-                    </p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [51]: frame2['state']
-Out[51]:
-one Ohio
-two Ohio
-three Ohio
-four Nevada
-five Nevada
-six Nevada
-Name: state, dtype: object
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [52]: frame2.year
-Out[52]:
-one 2000
-two 2001
-three 2002
-four 2001
-five 2002
-six 2003
-Name: year, dtype: int64
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">Rows can also be retrieved by position or name with the special loc attribute:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [53]: frame2.loc['three']
-Out[53]:
-year 2002
-state Ohio
-pop 3.6
-debt NaN
-Name: three, dtype: object
-</code></pre>
-                    </div>
-                    <p class="fragment">Columns can be modified by assignment.</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [54]: frame2['debt'] = 16.5
-In [55]: frame2
-Out[55]:
-    year state pop debt
-one 2000 Ohio 1.5 16.5
-two 2001 Ohio 1.7 16.5
-three 2002 Ohio 3.6 16.5
-four 2001 Nevada 2.4 16.5
-five 2002 Nevada 2.9 16.5
-six 2003 Nevada 3.2 16.5
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [56]: frame2['debt'] = np.arange(6.)
-In [57]: frame2
-Out[57]:
-    year state pop debt
-one 2000 Ohio 1.5 0.0
-two 2001 Ohio 1.7 1.0
-three 2002 Ohio 3.6 2.0
-four 2001 Nevada 2.4 3.0
-five 2002 Nevada 2.9 4.0
-six 2003 Nevada 3.2 5.0
-</code></pre>
-                    </div>
-                    <p class="fragment">When you are assigning lists or arrays to a column, the value’s length must match the length of the DataFrame. If you assign a Series, its labels will be realigned exactly to the DataFrame’s index, inserting missing values in any holes:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [58]: val = pd.Series([-1.2, -1.5, -1.7], index=['two', 'four', 'five'])
-In [59]: frame2['debt'] = val
-In [60]: frame2
-Out[60]:
-    year state pop debt
-one 2000 Ohio 1.5 NaN
-two 2001 Ohio 1.7 -1.2
-three 2002 Ohio 3.6 NaN
-four 2001 Nevada 2.4 -1.5
-five 2002 Nevada 2.9 -1.7
-six 2003 Nevada 3.2 NaN
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [61]: frame2['eastern'] = frame2.state == 'Ohio'
-In [62]: frame2
-Out[62]:
-    year state pop debt eastern
-one 2000 Ohio 1.5 NaN True
-two 2001 Ohio 1.7 -1.2 True
-three 2002 Ohio 3.6 NaN True
-four 2001 Nevada 2.4 -1.5 False
-five 2002 Nevada 2.9 -1.7 False
-six 2003 Nevada 3.2 NaN False
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [63]: del frame2['eastern']
-In [64]: frame2.columns
-Out[64]: Index(['year', 'state', 'pop', 'debt'], dtype='object')
-</code></pre>
-                    </div>
-                    <p class="fragment">The column returned from indexing a DataFrame is a view on the underlying data, not a copy. Thus, any in-place modifications to the Series will be reflected in the DataFrame. The column can be explicitly copied with the Series’s copy method.</p>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [65]: pop = {'Nevada': {2001: 2.4, 2002: 2.9},
-....: 'Ohio': {2000: 1.5, 2001: 1.7, 2002: 3.6}}
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [66]: frame3 = pd.DataFrame(pop)
-In [67]: frame3
-Out[67]:
-    Nevada Ohio
-2000 NaN 1.5
-2001 2.4 1.7
-2002 2.9 3.6
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [68]: frame3.T
-Out[68]:
-    2000 2001 2002
-Nevada NaN 2.4 2.9
-Ohio 1.5 1.7 3.6
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <p class="fragment">The keys in the inner dicts are combined and sorted to form the index in the result. This isn’t true if an explicit index is specified:</p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [69]: pd.DataFrame(pop, index=[2001, 2002, 2003])
-Out[69]:
-    Nevada Ohio
-2001 2.4 1.7
-2002 2.9 3.6
-2003 NaN NaN
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [70]: pdata = {'Ohio': frame3['Ohio'][:-1],
-....: 'Nevada': frame3['Nevada'][:2]}
-In [71]: pd.DataFrame(pdata)
-Out[71]:
-    Nevada Ohio
-2000 NaN 1.5
-2001 2.4 1.7
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [72]: frame3.index.name = 'year'; frame3.columns.name = 'state'
-In [73]: frame3
-Out[73]:
-state Nevada Ohio
-year
-2000 NaN 1.5
-2001 2.4 1.7
-2002 2.9 3.6
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [74]: frame3.values
-Out[74]:
-array([[ nan, 1.5],
-    [ 2.4, 1.7],
-    [ 2.9, 3.6]])
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable>
-In [75]: frame2.values
-Out[75]:
-array([[2000, 'Ohio', 1.5, nan],
-    [2001, 'Ohio', 1.7, -1.2],
-    [2002, 'Ohio', 3.6, nan],
-    [2001, 'Nevada', 2.4, -1.5],
-    [2002, 'Nevada', 2.9, -1.7],
-    [2003, 'Nevada', 3.2, nan]], dtype=object)
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <h3>Summary: Pandas (1)</h3>
                     <ul>
-                        <li class="fragement">
-                            <p>Create: obj = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c']), obj.values, obj.index (like an ordered dictionary), sdata = pd.Series({'Ohio': 35000})</p>
+                        <li>Visualizing Repositories Using Pygal</li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+import requests
+import pygal
+from pygal.style import LightColorizedStyle as LCS, LightenStyle as LS
+
+URL = 'https://api.github.com/search/repositories?q=language:python&sort=star'
+r = requests.get(URL)
+print("Status code:", r.status_code)
+response_dict = r.json()
+print("Total repositories:", response_dict['total_count'])
+repo_dicts = response_dict['items']
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+names, stars = [], []
+for repo_dict in repo_dicts:
+    names.append(repo_dict['name'])
+    stars.append(repo_dict['stargazers_count'])
+# Make visualization.
+my_style = LS('#333366', base_style=LCS)
+chart = pygal.Bar(style=my_style, x_label_rotation=45, show_legend=False)
+chart.title = 'Most-Starred Python Projects on GitHub'
+chart.x_labels = names
+
+chart.add('', stars)
+chart.render_to_file('python_repos.svg')
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <ul>
+                        <li><a href="https://news.ycombinator.com/">Hacker News API</a></li>
+                        <li><a href="https://hacker-news.firebaseio.com/v0/item/9884165.json">9884165</a></li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+{
+"by":"nns",
+"descendants":297,
+"id":9884165,
+"kids":[9885099,9884723,9885165,9884789,9885604,9884137,
+9886151,9885220,9885790,9884661,9885844,9885029,9884817,
+9887342,9884545,9884372,9884499,9884881,9884109,9886496,
+9884342,9887832,9885023,9884334,9884707,9887008,9885348,
+9885131,9887539,9885880,9884196,9884640,9886534,9885152],
+"score":558,
+"time":1436875181,
+"title":"New Horizons: Nasa spacecraft speeds past Pluto",
+"type":"story",
+"url":"http://www.bbc.co.uk/news/science-environment-33524589"
+}
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+import requests
+from operator import itemgetter
+# Make an API call and store the response.
+url = 'https://hacker-news.firebaseio.com/v0/topstories.json'
+r = requests.get(url)
+print("Status code:", r.status_code)
+# Process information about each submission.
+
+submission_ids = r.json()
+submission_dicts = []
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+
+for submission_id in submission_ids[:5]:
+# Make a separate API call for each submission.
+    url = ('https://hacker-news.firebaseio.com/v0/item/' +
+        str(submission_id) + '.json')
+    submission_r = requests.get(url)
+    print(submission_r.status_code)
+    response_dict = submission_r.json()
+    submission_dict = {
+        'title': response_dict['title'],
+        'link': 'http://news.ycombinator.com/item?id=' + str(submission_id),
+        'comments': response_dict.get('descendants', 0)
+        }
+    submission_dicts.append(submission_dict)    
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+submission_dicts = sorted(submission_dicts, key=itemgetter('comments'),reverse=True)
+for submission_dict in submission_dicts:
+    print("\nTitle:", submission_dict['title'])
+    print("Discussion link:", submission_dict['link'])
+    print("Comments:", submission_dict['comments'])
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <ul>
+                        <li>Where to find API?</li>
+                        <li><a href="https://news.ycombinator.com/">Public APIs</a></li>
+                    </ul>
+                </section>
+                <section>
+                    <p>Working with APIs</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+import requests
+
+url = "http://t.weather.sojson.com/api/weather/city/101020100"
+r = requests.get(url)
+print(r.status_code)
+
+response_dict = r.json()
+f = response_dict['data']
+ff = f['forecast']
+ff_today = ff[0]
+ff_1 = ff[1]
+ff_2 = ff[2]
+
+def show(day):
+    for x in day:
+        print(x +': ' + str(day[x]))
+    print('\n')
+show(ff_today)
+show(ff_1)
+show(ff_2)
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p><a href="http://www.tuling123.com/">Turing Robot</a></p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+import requests     
+    
+KEY = '' # 这里填拿到的key    
+    
+def get_response(msg):    
+    apiUrl = 'http://www.tuling123.com/openapi/api'    
+    data = {    
+        'key'    : KEY,    
+        'info'   : msg,    
+        'userid' : '路老师',    
+    }    
+    try:    
+        r = requests.post(apiUrl, data=data).json()    
+        return r.get('text')    
+    except:    
+        return None
+print(get_response('你好'))
+</code></pre>
+                    </div>
+                </section>
+            </section>
+            <section>
+                <section data-background="#2980b9" style="color: white">
+                    <h2 style="color: white">12.3 Wordcloud & Encoding</h2>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="wordcloud_ex.png" style="height: 400pt"></div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
+ 
+string = 'Importance of relative word frequencies for font-size. 
+With relative_scaling=0, only word-ranks are considered. With 
+relative_scaling=1, a word that is twice as frequent will have 
+twice the size. If you want to consider the word frequencies 
+and not only their rank, relative_scaling around .5 often looks good.'
+font = r'C:\Windows\Fonts\Arial.TTF'
+wc = WordCloud(font_path=font, #如果是中文必须要添加这个，否则会显示成框框
+               background_color='white',
+               width=1000,
+               height=800,
+               ).generate(string)
+wc.to_file('ss.png') #保存图片
+plt.imshow(wc)  #用plt显示图片
+plt.axis('off') #不显示坐标轴
+plt.show() #显示图片
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h3>Character encoding Encoding</h3>
+                    <ul>
+                        <li>ASCII</li>
+                        <li>Unicode</li>
+                        <li>UTF-8</li>
+                    </ul>
+                </section>
+                <section>
+                    <ul>
+                        <li>
+                            <p>Python Crash Couse (Chapters we do not cover: Chapter 12 - 14, 18 - 20)</p>
+                            <ul>
+                                <li>
+                                    <p>Chapter 12 -14: Alien Invasion</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 18 - 20: Django</p>
+                                </li>
+                            </ul>
                         </li>
-                        <li class="fragement">
-                            <p>Filter: obj2[obj2 > 0]; obj2*2, np.exp(obj2)</p>
-                        </li>
-                        <li class="fragement">
-                            <p>Detect null: pd.isnull(obj4), pd.notnull(obj4), obj4.isnull()</p>
-                        </li>
-                        <li class="fragement">
-                            <p>Name: obj4.name, obj4.index.name</p>
-                        </li>
-                        <li class="fragement">
-                            <p>DataFrame: pd.DataFrame(data), pd.DataFrame(data, columns=['year', 'state', 'pop']), frame2.loc['three'] <b>(rows)</b>, pd.DataFrame(pop, index=[2001, 2002, 2003])</p>
-                        </li>
-                        <li class="fragement">
-                            <p>frame3.index.name, frame3.columns.name, frame3.values</p>
+                        <li>
+                            <p>Python for Everybody (Chapters we do not cover: Chapter 11 - 13, 15 - 16)</p>
+                            <ul>
+                                <li>
+                                    <p>Chapter 11: Regualer Expressions</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 12: Networked Programs 12.4 - 12.8 (urlib, BeautifulSoup)</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 13: Using Web Services (XML, JSON, API)</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 15: Databases and SQL</p>
+                                </li>
+                                <li>
+                                    <p>Chapter 16: Visualizing data (Network, Word Cloud)</p>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </section>
@@ -890,9 +617,11 @@ array([[2000, 'Ohio', 1.5, nan],
                 <section data-background="#2c3e50" style="color: white; text-align: left;">
                     <h2 style="color: white">Summary</h2>
                     <ul>
-                        <li>Pandas</li>
+                        <li>Downloading Data</li>
+                        <li>API</li>
+                        <li>Wordcloud</li>
                         <ul>
-                            <li>Reading: Python for Data Analysis, Chapter 5</li>
+                            <li>Reading: Python Crash Course, Chapter 16, 17</li>
                         </ul>
                     </ul>
                 </section>
