@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/theme/white.css">
     <link rel="stylesheet" href="css/theme/custom.css">
     <!-- Theme used for syntax highlighting of code -->
-    <link rel="stylesheet" href="lib/css/github-gist.css">
+    <link rel="stylesheet" href="lib/css/googlecode.css">
     <!-- Printing and PDF exports -->
     <script>
     var link = document.createElement('link');
@@ -25,603 +25,885 @@
         <div class="slides">
             <section data-background-video="bgm.mp4" data-background-video-loop data-background-video-muted style="text-align: left;">
                 <h2 style="color: white">Python Programming</h2>
-                <h5 style="color: white">Lecture 12 Downloading Data, API</h5>
+                <h5 style="color: white">Lecture 12 Data Cleaning, Language and Text</h5>
             </section>
             <section>
                 <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">12.1 Downloading Data (2)</h2>
-                </section>
-                <section>
-                    <p><b>.JSON</b></p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-
-import json
-
-filename = 'btc_close_2017.json'
-with open(filename) as f:
-    btc_data = json.load(f)  
-
-for btc_dict in btc_data:
-    date = btc_dict['date']
-    month = int(btc_dict['month'])
-    week = int(btc_dict['week'])
-    weekday = btc_dict['weekday']
-    close = int(float(btc_dict['close']))  
-    print("{} is month {} week {}, {}, the close price is {} RMB".format(
-        date, month, week, weekday, close))
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-2017-01-01 is month 1 week 52, Sunday, the close price is 6928 RMB
-2017-01-02 is month 1 week 1, Monday, the close price is 7070 RMB
-2017-01-03 is month 1 week 1, Tuesday, the close price is 7175 RMB
-2017-01-04 is month 1 week 1, Wednesday, the close price is 7835 RMB
-2017-01-05 is month 1 week 1, Thursday, the close price is 6928 RMB
-...
-</code></pre>
-                    </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-
-
-line_chart = pygal.Line(x_label_rotation=20, show_minor_x_labels=False) 
-line_chart.title = '收盘价（¥）'
-line_chart.x_labels = dates
-N = 20  # X-axis shows the date for every 20 days 
-line_chart.x_labels_major = dates[::N]
-line_chart.add('收盘价', close)
-line_chart.render_to_file('收盘价折线图（¥）.svg')
-</code></pre>
-                    </div>
-                    <div class="fragment"><img data-src="close_price.svg" style="height: 350pt"></div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-line_chart = pygal.Line(x_label_rotation=20, show_minor_x_labels=False)
-line_chart.title = '收盘价对数变换（¥）'
-line_chart.x_labels = dates
-N = 20
-line_chart.x_labels_major = dates[::N]
-<mark>close_log = [math.log10(xx) for xx in close]</mark>
-<mark>line_chart.add('log收盘价', close_log)</mark>
-line_chart.render_to_file('收盘价对数变换折线图（¥）.svg')
-</code></pre>
-                    </div>
-                    <div class="fragment"><img data-src="close_price_log.svg" style="height: 350pt"></div>
-                </section>
-                <section>
-                    <p><b>itertools</b></p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-import itertools
-
-nums = itertools.count(0,2)
-for i in nums:
-    if i > 6:
-        break
-    print(i, end = " ")
-#output
-0 2 4 6 
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-import itertools
-
-cycle_strings = itertools.cycle('ABC')
-i = 1
-for string in cycle_strings:
-    if i == 7:
-        break
-    print(i, string)
-    i += 1
-#output
-1 A
-2 B
-3 C
-4 A
-5 B
-6 C
-</code></pre>
-                    </div>
+                    <h2 style="color: white">12.1 Pandas (7)</h2>
+                    <h5>Handling Missing Data</h5>
                 </section>
                 <section>
                     <ul>
                         <li class="fragment">
-                            <p>We have learned <b>generator</b>.(next(), for)</p>
+                            <p>During the course of doing data analysis and modeling, a significant amount of time is spent on data preparation: loading, cleaning, transforming, and rearranging. Such tasks are often reported to take up 80% or more of an analyst's time.</p>
                         </li>
-                        <div class="fragment">
-                            <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-g = (x * x for x in range(10))
+                        <li class="fragment">
+                            <p>In pandas, we've adopted a convention used in the R programming language by referring to missing data as NA, which stands for not available. In statistics applications, NA data may either be data that does not exist or that exists but was not observed.</p>
+                        </li>
+                        <li class="fragment">
+                            <p>When cleaning up data for analysis, it is often important to do analysis on the missing data itself to identify data collection problems or potential biases in the data caused by missing data.</p>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <h6>Filtering Out Missing Data</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+import pandas as pd
+from numpy import nan as NA
 
-def fib(max):
-    n, a, b = 0, 0, 1
-    while n < max:
-        yield b
-        a, b = b, a + b
-        n = n + 1
-    return 'done'
+data = {'state': ['Ohio', 'Ohio', NA, 'Nevada', 'Nevada', 'Nevada'],
+'year': [2000, 2001, 2001, 2002, 2002, 2003],
+'pop': [1.5, 1.7, 3.6, 2.4, 2.9, NA]}
+frame = pd.DataFrame(data)
+</code></pre>
+                    </div>
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> frame
+    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+2     NaN  2001  3.6
+3  Nevada  2002  2.4
+4  Nevada  2002  2.9
+5  Nevada  2003  NaN
 </code></pre>
                         </div>
-                        <li class="fragment">
-                            <p><b>Iterator</b> is a more general concept: any object whose class has a next method (__next__ in Python 3) and an __iter__ method.</p>
-                        </li>
-                        <li class="fragment">
-                            <p>Every generator is an iterator, but not vice versa.</p>
-                        </li>
-                        <li class="fragment">
-                            <p><b>An iterator can only be traversed once.</b></p>
-                        </li>
-                        <li class="fragment">
-                            <p>Iterator and iterable are two different concepts</p>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-import itertools
-
-for item in itertools.repeat('hello world', 3):
-    print(item)
-
-hello world
-hello world
-hello world
-</code></pre>
                     </div>
-                    <p class="fragment"><b>groupby()</b></p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-from itertools import groupby
-
-for key, value_iter in groupby('aaabbbaaccd'):
-    print(key, ':', list(value_iter))
-
-a : ['a', 'a', 'a']
-b : ['b', 'b', 'b']
-a : ['a', 'a']
-c : ['c', 'c']
-d : ['d']
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> frame.info()
+RangeIndex: 6 entries, 0 to 5
+Data columns (total 3 columns):
+state    5 non-null object
+year     6 non-null int64
+pop      5 non-null float64
+dtypes: float64(1), int64(1), object(1)
+memory usage: 272.0+ bytes
 </code></pre>
+                        </div>
                     </div>
                 </section>
                 <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-from itertools import groupby
-
-data = ['a', 'bb', 'ccc', 'dd', 'eee', 'f']
-for key, value_iter in groupby(data, len):  
-    print(key, ':', list(value_iter))
-
-1 : ['a']
-2 : ['bb']
-3 : ['ccc']
-2 : ['dd']
-3 : ['eee']
-1 : ['f']
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> frame.isnull()
+   state   year    pop
+0  False  False  False
+1  False  False  False
+2   True  False  False
+3  False  False  False
+4  False  False  False
+5  False  False   True      
 </code></pre>
+                        </div>
                     </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-from itertools import groupby
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> frame.dropna()
 
-data = ['a', 'bb', 'cc', 'ddd', 'eee', 'f']
-for key, value_iter in groupby(data, len):  
-    print(key, ':', list(value_iter))
 
-1 : ['a']
-2 : ['bb', 'cc']
-3 : ['ddd', 'eee']
-1 : ['f']
+    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+3  Nevada  2002  2.4
+4  Nevada  2002  2.9
 </code></pre>
+                        </div>
                     </div>
-                </section>
-                <section>
-                    <p><b>zip()</b></p>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
->>> a = [1,2,3]
->>> b = [4,5,6]
->>> c = [4,5,6,7,8]
->>> zipped = zip(a,b)
->>> zipped
-<zip object at 0x02B01B48> #返回的是一个对象(iterator)
->>> list(zipped)
-[(1, 4), (2, 5), (3, 6)] #使用list()函数转换为列表
->>> list(zip(a,c))
-[(1, 4), (2, 5), (3, 6)]
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> frame['debt']=NA
+>>> frame
+    state  year  pop  debt
+0    Ohio  2000  1.5   NaN
+1    Ohio  2001  1.7   NaN
+2     NaN  2001  3.6   NaN
+3  Nevada  2002  2.4   NaN
+4  Nevada  2002  2.9   NaN
+5  Nevada  2003  NaN   NaN   
 </code></pre>
+                        </div>
                     </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
->>> a = [1,2,3]
->>> b = [4,5,6]
->>> c = [4,5,6,7,8]
->>> zipped = zip(a,b)
->>> list(zip(*zipped)) #解压也使用list进行转换
-[(1, 2, 3), (4, 5, 6)]
->>> zipped = zip(a,b)
->>> x,y = zip(*zipped)
->>> print(x)
-(1,2,3)
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> frame=frame.dropna(axis=1,how="all")
+
+    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+2     NaN  2001  3.6
+3  Nevada  2002  2.4
+4  Nevada  2002  2.9
+5  Nevada  2003  NaN
 </code></pre>
+                        </div>
                     </div>
                 </section>
                 <section>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-from itertools import groupby
-
-def draw_line(x_data, y_data, title, y_legend):
-    xy_map = []
-    <mark>for x, y in groupby(sorted(zip(x_data, y_data)), key=lambda _: _[0]):</mark>  
-        y_list = [v for _, v in y]
-        xy_map.append([x, sum(y_list) / len(y_list)])  
-    x_unique, y_mean = zip(*xy_map) # [*zip(*xy_map)] 
-    line_chart = pygal.Line()
-    line_chart.title = title
-    line_chart.x_labels = x_unique
-    line_chart.add(y_legend, y_mean)
-    line_chart.render_to_file(title + '.svg')
-    return line_chart
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> frame.dropna(thresh=3)
+    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+3  Nevada  2002  2.4
+4  Nevada  2002  2.9  
 </code></pre>
                     </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-idx_month = dates.index('2017-12-01') #list.index()
-line_chart_month = draw_line(
-    months[:idx_month], close[:idx_month], '收盘价月日均值（¥）', '月日均值')
+                    <p class="fragment">Filling in missing data</p>
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> frame.fillna(0)
+
+    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+2       0  2001  3.6
+3  Nevada  2002  2.4
+4  Nevada  2002  2.9
+5  Nevada  2003  0.0    
 </code></pre>
+                        </div>
+                    </div>
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> frame.fillna({'state':'Ohio',
+...:               'pop': 2})
+    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+2    Ohio  2001  3.6
+3  Nevada  2002  2.4
+4  Nevada  2002  2.9
+5  Nevada  2003  2.0
+</code></pre>
+                        </div>
                     </div>
                 </section>
                 <section>
-                    <div class="fragment"><img data-src="close_price_avg.svg" style="height: 400pt"></div>
-                </section>
-            </section>
-            <section>
-                <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">12.2 API</h2>
-                </section>
-                <section>
-                    <p>GitHub</p>
-                    <p><a href="https://api.github.com/search/repositories?q=language:python&sort=stars">https://api.github.com/search/repositories?q=language:python&sort=stars</a></p>
+                    <h6>Removing Duplicates</h6>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-url = 'https://api.github.com/search/repositories?q=language:python&sort=stars'
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-import requests
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> data = pd.DataFrame({'k1': ['one', 'two'] * 3 + ['two'],
+....:   'k2': [1,3,2,3,3,4,4], 'v1':[0,1,2,3,4,5,5]})
 
-# Make an API call and store the response.
-r = requests.get(url)
-print("Status code:", r.status_code)
-# Store API response in a variable.
-response_dict = r.json()
-
-print(response_dict.keys())
 </code></pre>
                     </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-Status code: 200
-dict_keys(['total_count', 'incomplete_results', 'items'])
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> data
+    k1  k2  v1
+0  one   1   0
+1  two   3   1
+2  one   2   2
+3  two   3   3
+4  one   3   4
+5  two   4   5
+6  two   4   5
 </code></pre>
+                        </div>
                     </div>
-                </section>
-                <section>
-                    <ul>
-                        <li>Working with the Response Dictionary</li>
-                    </ul>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-import requests
-url = 'https://api.github.com/search/repositories?q=language:python&sort=stars'
-# Make an API call and store the response.
-r = requests.get(url)
-print("Status code:", r.status_code)
-# Store API response in a variable.
-response_dict = r.json()
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> data.duplicated()
+0    False
+1    False
+2    False
+3    False
+4    False
+5    False
+6     True
+dtype: bool
 </code></pre>
+                        </div>
                     </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-print("Total repositories:", response_dict['total_count'])
-# Explore information about the repositories.
-repo_dicts = response_dict['items']
-print("Repositories returned:", len(repo_dicts))
-
-# Examine the first repository.
-repo_dict = repo_dicts[0]
-print("\nKeys:", len(repo_dict))
-for key in sorted(repo_dict.keys()):
-    print(key)
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> data.drop_duplicates()
+    k1  k2  v1
+0  one   1   0
+1  two   3   1
+2  one   2   2
+3  two   3   3
+4  one   3   4
+5  two   4   5
 </code></pre>
+                        </div>
                     </div>
-                </section>
-                <section>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-print("\nSelected information about first repository:")
-print('Name:', repo_dict['name'])
-print('Owner:', repo_dict['owner']['login'])
-print('Stars:', repo_dict['stargazers_count'])
-print('Repository:', repo_dict['html_url'])
-print('Created:', repo_dict['created_at'])
-print('Updated:', repo_dict['updated_at'])
-print('Description:', repo_dict['description'])
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> data.drop_duplicates(['k1','k2'])
+    k1  k2  v1
+0  one   1   0
+1  two   3   1
+2  one   2   2
+4  one   3   4
+5  two   4   5
+# keep="last", False
 </code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-Status code: 200
-Total repositories: 3675320
-Repositories returned: 30
-
-Selected information about first repository:
-Name: public-apis
-Owner: toddmotto
-Stars: 57212
-Repository: https://github.com/toddmotto/public-apis
-Created: 2016-03-20T23:49:42Z
-Updated: 2019-05-22T09:34:50Z
-Description: A collective list of free APIs for use in software and web development.
-</code></pre>
+                        </div>
                     </div>
                 </section>
                 <section>
-                    <ul>
-                        <li>Visualizing Repositories Using Pygal</li>
-                    </ul>
+                    <h6>Transforming Data</h6>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-import requests
-import pygal
-from pygal.style import LightColorizedStyle as LCS, LightenStyle as LS
-
-URL = 'https://api.github.com/search/repositories?q=language:python&sort=star'
-r = requests.get(URL)
-print("Status code:", r.status_code)
-response_dict = r.json()
-print("Total repositories:", response_dict['total_count'])
-repo_dicts = response_dict['items']
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> data = pd.DataFrame({'food': ['bacon', 'pulled pork', 'bacon',
+....:                         'Pastrami', 'corned beef', 'Bacon',
+....:                         'pastrami', 'honey ham', 'nova lox'],
+....:                         'ounces': [4, 3, 12, 6, 7.5, 8, 3, 5, 6]})
 </code></pre>
                     </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-names, stars = [], []
-for repo_dict in repo_dicts:
-    names.append(repo_dict['name'])
-    stars.append(repo_dict['stargazers_count'])
-# Make visualization.
-my_style = LS('#333366', base_style=LCS)
-chart = pygal.Bar(style=my_style, x_label_rotation=45, show_legend=False)
-chart.title = 'Most-Starred Python Projects on GitHub'
-chart.x_labels = names
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> data
 
-chart.add('', stars)
-chart.render_to_file('python_repos.svg')
+          food  ounces
+0        bacon     4.0
+1  pulled pork     3.0
+2        bacon    12.0
+3     Pastrami     6.0
+4  corned beef     7.5
+5        Bacon     8.0
+6     pastrami     3.0
+7    honey ham     5.0
+8     nova lox     6.0
 </code></pre>
+                        </div>
                     </div>
-                </section>
-                <section>
-                    <ul>
-                        <li><a href="https://news.ycombinator.com/">Hacker News API</a></li>
-                        <li><a href="https://hacker-news.firebaseio.com/v0/item/9884165.json">9884165</a></li>
-                    </ul>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-{
-"by":"nns",
-"descendants":297,
-"id":9884165,
-"kids":[9885099,9884723,9885165,9884789,9885604,9884137,
-9886151,9885220,9885790,9884661,9885844,9885029,9884817,
-9887342,9884545,9884372,9884499,9884881,9884109,9886496,
-9884342,9887832,9885023,9884334,9884707,9887008,9885348,
-9885131,9887539,9885880,9884196,9884640,9886534,9885152],
-"score":558,
-"time":1436875181,
-"title":"New Horizons: Nasa spacecraft speeds past Pluto",
-"type":"story",
-"url":"http://www.bbc.co.uk/news/science-environment-33524589"
-}
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> lowercased = data['food'].apply(
+...:            lambda x: x.lower())
+>>> lowercased
+0          bacon
+1    pulled pork
+2          bacon
+3       pastrami
+4    corned beef
+5          bacon
+6       pastrami
+7      honey ham
+8       nova lox
 </code></pre>
+                        </div>
                     </div>
                 </section>
                 <section>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-import requests
-from operator import itemgetter
-# Make an API call and store the response.
-url = 'https://hacker-news.firebaseio.com/v0/topstories.json'
-r = requests.get(url)
-print("Status code:", r.status_code)
-# Process information about each submission.
-
-submission_ids = r.json()
-submission_dicts = []
+                        <pre><code class="line-numbers" data-trim contenteditable>
+meat_to_animal = {'bacon': 'pig','pulled pork': 'pig',
+                'pastrami': 'cow','corned beef': 'cow',
+                'honey ham': 'pig','nova lox': 'salmon'}
 </code></pre>
                     </div>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-
-for submission_id in submission_ids[:5]:
-# Make a separate API call for each submission.
-    url = ('https://hacker-news.firebaseio.com/v0/item/' +
-        str(submission_id) + '.json')
-    submission_r = requests.get(url)
-    print(submission_r.status_code)
-    response_dict = submission_r.json()
-    submission_dict = {
-        'title': response_dict['title'],
-        'link': 'http://news.ycombinator.com/item?id=' + str(submission_id),
-        'comments': response_dict.get('descendants', 0)
-        }
-    submission_dicts.append(submission_dict)    
-</code></pre>
-                    </div>
-                    <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-submission_dicts = sorted(submission_dicts, key=itemgetter('comments'),reverse=True)
-for submission_dict in submission_dicts:
-    print("\nTitle:", submission_dict['title'])
-    print("Discussion link:", submission_dict['link'])
-    print("Comments:", submission_dict['comments'])
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> data['animal'] = lowercased.map(meat_to_animal)
+>>> data
+          food  ounces  animal
+0        bacon     4.0     pig
+1  pulled pork     3.0     pig
+2        bacon    12.0     pig
+3     Pastrami     6.0     cow
+4  corned beef     7.5     cow
+5        Bacon     8.0     pig
+6     pastrami     3.0     cow
+7    honey ham     5.0     pig
+8     nova lox     6.0  salmon
 </code></pre>
                     </div>
                 </section>
                 <section>
-                    <ul>
-                        <li>Where to find API?</li>
-                        <li><a href="https://github.com/toddmotto/public-apis">Public APIs</a></li>
-                    </ul>
-                </section>
-                <section>
-                    <p>Working with APIs</p>
+                    <p class="fragment">Replacing Values</p>
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> data.replace("pig","pig-1")
+          food  ounces  animal
+0        bacon     4.0   pig-1
+1  pulled pork     3.0   pig-1
+2        bacon    12.0   pig-1
+3     Pastrami     6.0     cow
+4  corned beef     7.5     cow
+5        Bacon     8.0   pig-1
+6     pastrami     3.0     cow
+7    honey ham     5.0   pig-1
+8     nova lox     6.0  salmon
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+>>> data.replace(["pig","cow"],"pig-2")
+          food  ounces  animal
+0        bacon     4.0   pig-2
+1  pulled pork     3.0   pig-2
+2        bacon    12.0   pig-2
+3     Pastrami     6.0   pig-2
+4  corned beef     7.5   pig-2
+5        Bacon     8.0   pig-2
+6     pastrami     3.0   pig-2
+7    honey ham     5.0   pig-2
+8     nova lox     6.0  salmon
+</code></pre>
+                        </div>
+                    </div>
+                    <p class="fragment">many to many, by dict</p>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-import requests
-
-url = "http://t.weather.sojson.com/api/weather/city/101020100"
-r = requests.get(url)
-print(r.status_code)
-
-response_dict = r.json()
-f = response_dict['data']
-ff = f['forecast']
-ff_today = ff[0]
-ff_1 = ff[1]
-ff_2 = ff[2]
-
-def show(day):
-    for x in day:
-        print(x +': ' + str(day[x]))
-    print('\n')
-show(ff_today)
-show(ff_1)
-show(ff_2)
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> data.replace({"pig":"pig-1","cow":"cow-1"})
 </code></pre>
                     </div>
                 </section>
                 <section>
-                    <p><a href="http://www.tuling123.com/">Turing Robot</a></p>
+                    <p class="fragment">Detecting and Filtering Outliers</p>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
-import requests     
-    
-KEY = '' # 这里填拿到的key    
-    
-def get_response(msg):    
-    apiUrl = 'http://www.tuling123.com/openapi/api'    
-    data = {    
-        'key'    : KEY,    
-        'info'   : msg,    
-        'userid' : '路老师',    
-    }    
-    try:    
-        r = requests.post(apiUrl, data=data).json()    
-        return r.get('text')    
-    except:    
-        return None
-print(get_response('你好'))
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> data[data['ounces']>=8]=NA
+>>> data
+          food  ounces  animal
+0        bacon     4.0     pig
+1  pulled pork     3.0     pig
+2          NaN     NaN     NaN
+3     Pastrami     6.0     cow
+4  corned beef     7.5     cow
+5          NaN     NaN     NaN
+...
+>>> data = data.dropna()
+</code></pre>
+                    </div>
+                    <p class="fragment">Computing Dummy Variables</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> dummies = pd.get_dummies(data['animal'])
+>>> data.join(dummies)
+          food  ounces  animal  cow  pig  salmon
+0        bacon     4.0     pig    0    1       0
+1  pulled pork     3.0     pig    0    1       0
+3     Pastrami     6.0     cow    1    0       0
+4  corned beef     7.5     cow    1    0       0
+6     pastrami     3.0     cow    1    0       0
+7    honey ham     5.0     pig    0    1       0
+8     nova lox     6.0  salmon    0    0       1
 </code></pre>
                     </div>
                 </section>
             </section>
             <section>
                 <section data-background="#2980b9" style="color: white">
-                    <h2 style="color: white">12.3 Wordcloud & Encoding</h2>
+                    <h2 style="color: white">12.2 Pandas (8)</h2>
+                    <h5>Handling Chinese Language</h5>
                 </section>
                 <section>
-                    <div class="fragment"><img data-src="wordcloud_ex.png" style="height: 400pt"></div>
+                    <div class="fragment"><img data-src="db.jpg" style="height: 450pt"></div>
+                </section>
+                <section>
+                    <h6>Loading .xlsx file</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+import pandas as pd
+db =pd.read_excel('db_top.xlsx', encoding='utf-8')
+
+# pd.read_excel('db_top.xlsx', sheet_name="Sheet1")
+# pd.read_excel('db_top.xlsx', sheet_name=0, index_col=0\
+                header=1, usecols=[0,2])
+</code></pre>
+                    </div>
+                    <p class="fragment">Character Encoding: ASCII, Unicode, UTF-8, , GBK</p>
+                    <div class="fragment"><img data-src="ASCII1.png" style="height: 300pt"></div>
                 </section>
                 <section>
                     <div class="fragment">
-                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> db.columns
+Index(['id', '全名', '导演', '类型', '摘要', '评分', '时长', '时间', 
+       '年份', '演员', '投票数','发行信息', '中文名', '外文名'],dtype='object')
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> genre = db.[['中文名', '类型']].copy()
+>>> genre
+           中文名              类型
+0         星际穿越  剧情,科幻,悬疑,家庭,冒险
+1       辛德勒的名单        剧情,历史,战争
+2       唐伯虎点秋香        喜剧,爱情,古装
+3         致命ID        剧情,悬疑,惊悚
+4    指环王3：王者无敌     剧情,动作,奇幻,冒险
+..         ...             ...
+245     地球上的星星        剧情,家庭,儿童
+246       记忆碎片     剧情,悬疑,惊悚,犯罪
+247       蝴蝶效应     剧情,科幻,悬疑,惊悚
+248      海上钢琴师           剧情,音乐
+249    三傻大闹宝莱坞     剧情,喜剧,爱情,歌舞
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+all_g_list = []
+for x in genre['类型']:
+    all_g_list.append(x.split(','))
+genre["类型"]=all_g_list
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+# 单个电影
+x = pd.DataFrame()
+x['类型'] = genre.iloc[0]['类型']
+x["中文名"] = genre.iloc[0]['中文名']
+x['d']=1
+x= pd.pivot_table(x,index='中文名', columns='类型',values='d')
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+>>> x
+类型    冒险  剧情  家庭  悬疑  科幻
+中文名                     
+星际穿越   1    1    1     1     1
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+# 所有电影
+genre_list = pd.DataFrame()
+for i in range(len(genre)):
+    x = pd.DataFrame()
+    x['类型'] = genre.iloc[i]['类型']
+    x["中文名"] = genre.iloc[i]['中文名']
+    x['d']=1
+    x = pd.pivot_table(x,index='中文名', columns='类型',values='d')
+    genre_list=pd.concat([genre_list,x])
+genre_list.fillna(0)
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+# genre_list.to_csv('g.csv',encoding='utf-8-sig')
+</code></pre>
+                    </div>
+                    <p class="fragment">We can run regression with those dummy variables and scores of movies.</p>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+all_g = []
+for y in genre['类型']:
+    all_g.extend(y)
+g = list(pd.unique(all_g))
+g.remove('剧情')
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+rank_two = []
+for x_1 in range(len(g)):
+    for x_2 in range(x_1+1,len(g)):
+        df = genre_list[[g[x_1],g[x_2]]]
+        df = df.dropna(how="all")
+        rank_two.append([len(df),g[x_1]+','+g[x_2]])
+rank_two.sort(reverse=True)
+for i in range(10):
+    print(rank_two[i])
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="output" data-trim contenteditable>
+[110, '爱情,犯罪'][103, '冒险,爱情'][95, '爱情,动作']
+[95, '悬疑,爱情'][92, '爱情,惊悚'][92, '冒险,犯罪']
+[91, '爱情,奇幻'][91, '喜剧,爱情'][90, '喜剧,犯罪']
+[86, '爱情,动画']
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <a href="https://seaborn.pydata.org/index.html">seaborn: statistical data visualization</a>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+                            pip install seaborn
+                    </code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
+director = db['导演'].value_counts()
+d = director.head(10)
+sns.barplot(y=(d.index), x=(d.values), palette="RdBu_r")
+plt.savefig('director.pdf',dpi=300, bbox='tight')
+                    </code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment"><img data-src="director.jpg" style="height: 350pt"></div>
+                </section>
+                <section>
+                    <h6>Saving to .xlsx</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+director.to_excel(excel_writer='director.xlsx', sheet_name="rank",\
+                    encoding='utf-8')
+
+# director.to_excel(excel_writer='director.xlsx', index=False,\
+                    columns=[...], na_rep=0, inf_rep=0)
+
+
+                    </code></pre>
+                    </div>
+                    <p class="fragment">Multiple Sheets</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+excelpath = '...'
+writer = pd.ExcelWriter(excelpath, engine="xlsxwriter")
+df1.to_excel(writer, sheet_name="first")
+df2.to_excel(writer, sheet_name="second")
+df3.to_excel(writer, sheet_name="third")
+
+writer.save()
+                    </code></pre>
+                    </div>
+                </section>
+            </section>
+            <section>
+                <section data-background="#2980b9" style="color: white">
+                    <h2 style="color: white">12.3 Text and Wordcloud</h2>
+                </section>
+                <section>
+                    <h6>Reading from a text File</h6>
+                    <div class="div-a">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+# string
+with open('pi_digits.txt') as file_object:
+    contents = file_object.read() 
+    print(contents.rstrip())
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="div-b">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+# pi_digits.txt
+3.1415926535
+  8979323846
+  2643383279
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="div-a">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+# Reading Line by Line
+filename = 'pi_digits.txt'
+with open(filename) as file_object:
+    for line in file_object:
+        print(line)
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="div-b">
+                        <div class="fragment">
+                            <pre><code class="output" data-trim contenteditable>
+3.1415926535
+
+  8979323846
+
+  2643383279
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="div-a">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+with open(filename) as file_object:
+    for line in file_object:
+        print(line.rstrip())
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="div-b">
+                        <div class="fragment">
+                            <pre><code class="output" data-trim contenteditable>
+3.1415926535
+  8979323846
+  2643383279
+</code></pre>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <p>Making a List of Lines from a File</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+filename = 'pi_digits.txt'
+
+with open(filename) as file_object:
+    lines = file_object.readlines() 
+</code></pre>
+                    </div>
+                    <div class="div-c">
+                        <div class="fragment">
+                            <pre><code class="line-numbers" data-trim contenteditable>
+pi_string = ''
+for line in lines:
+    pi_string += line.strip()
+print(pi_string)
+print(len(pi_string))
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="div-d">
+                        <div class="fragment">
+                            <pre><code class="output" contenteditable>
+3.141592653589793238462643383279 
+32
+
+
+</code></pre>
+                        </div>
+                    </div>
+                    <h6 class="fragment">Writing to a File</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+filename = 'programming.txt'
+
+with open(filename, 'w') as file_object:
+    file_object.write("I love programming.")
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h6>Writing to a File</h6>
+                    <ul>
+                        <li class="fragment">
+                            <p>The second argument, 'w', tells Python that we want to open the file in write mode. You can open a file 198 Chapter 10 in read mode ('r'), write mode ('w'), append mode ('a'), or a mode that allows you to read and write to the file ('r+'). If you omit the mode argument, Python opens the file in read-only mode by default.</p>
+                        </li>
+                        <li class="fragment">
+                            <p><b>Python can only write strings to a text file. If you want to store numerical data in a text file, you'll have to convert the data to string format first using the str() function.</b></p>
+                        </li>
+                    </ul>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+filename = 'programming.txt'
+with open(filename, 'w') as file_object:
+    file_object.write("I love programming.")
+    file_object.write("I love creating new games.")
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="output" data-trim contenteditable>
+I love programming.I love creating new games.   
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+filename = 'programming.txt'
+with open(filename, 'w') as file_object:
+    file_object.write("I love programming.\n")
+    file_object.write("I love creating new games.\n")
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="output" data-trim contenteditable>
+I love programming.
+I love creating new games.
+</code></pre>
+                    </div>
+                    <h6 class="fragment">Appending to a File</h6>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+filename = 'programming.txt'
+message.py
+with open(filename, 'a') as file_object:
+    file_object.write("I also love finding meaning in large datasets.\n")
+    file_object.write("I love creating apps that can run in a browser.\n")
+</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="output" data-trim contenteditable>
+I love programming.
+I love creating new games.
+I also love finding meaning in large datasets.
+I love creating apps that can run in a browser.
+</code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p class="fragment">Working with Multiple Files</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+def count_words(filename):
+    try:
+        with open(filename) as f_obj:
+            contents = f_obj.read()
+    except FileNotFoundError:
+        msg = "The file "+filename+" does not exist."
+        print(msg)
+    else:
+        words = contents.split()
+        num_words = len(words)
+        print(filename + ": " + str(num_words))
+                    </code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
+filenames = ['alice.txt', 'siddhartha.txt', \
+            'moby_dick.txt', 'little_women.txt']
+for filename in filenames:
+    count_words(filename)
+                    </code></pre>
+                    </div>
+                </section>
+                <section>
+                    <h5>Wordcloud</h5>
+                    <div class="fragment"><img data-src="wordcloud_ex.png" style="height: 300pt"></div>
+                </section>
+                <section>
+                    <p class="fragment">A long string</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
 from matplotlib import pyplot as plt
 from wordcloud import WordCloud
- 
+                    </code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
 string = 'Importance of relative word frequencies for font-size. 
 With relative_scaling=0, only word-ranks are considered. With 
 relative_scaling=1, a word that is twice as frequent will have 
 twice the size. If you want to consider the word frequencies 
 and not only their rank, relative_scaling around .5 often looks good.'
+                    </code></pre>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable>
 font = r'C:\Windows\Fonts\Arial.TTF'
 wc = WordCloud(font_path=font, #如果是中文必须要添加这个，否则会显示成框框
                background_color='white',
                width=1000,
                height=800,
                ).generate(string)
-wc.to_file('ss.png') #保存图片
+wc.to_file('s1.png') #保存图片
 plt.imshow(wc)  #用plt显示图片
 plt.axis('off') #不显示坐标轴
 plt.show() #显示图片
+                    </code></pre>
+                    </div>
+                </section>
+                <section>
+                    <p>Loading text file</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
+ 
+filename = 'Harry Potter.txt'
+with open(filename , encoding="utf-8") as f_obj:
+    contents = f_obj.read()
+
+font = r'C:\Windows\Fonts\Arial.TTF'
+wc = WordCloud(font_path=font, 
+               background_color='white',
+               width=1000,
+               height=800,
+               ).generate(contents)
+wc.to_file('s2.png') 
+plt.imshow(wc)  
+plt.axis('off') 
+plt.show() 
 </code></pre>
                     </div>
                 </section>
                 <section>
-                    <h3>Character encoding Encoding</h3>
-                    <ul>
-                        <li>ASCII</li>
-                        <li>Unicode</li>
-                        <li>UTF-8</li>
-                    </ul>
+                    <p>Loading Chinese text file</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
+
+filename = 'sanguo.txt'
+with open(filename , encoding="utf-8") as f_obj:
+    contents = f_obj.read()
+
+
+font = r'C:\Windows\Fonts\simkai.ttf'
+wc = WordCloud(font_path=font, 
+               background_color='white',
+               width=1000,
+               height=800,
+               ).generate(contents)
+wc.to_file('s3.png') 
+plt.imshow(wc)  
+plt.axis('off') 
+plt.show() 
+</code></pre>
+                    </div>
                 </section>
                 <section>
-                    <ul>
-                        <li>
-                            <p>Python Crash Couse (Chapters we do not cover: Chapter 12 - 14, 18 - 20)</p>
-                            <ul>
-                                <li>
-                                    <p>Chapter 12 -14: Alien Invasion</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 18 - 20: Django</p>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <p>Python for Everybody (Chapters we do not cover: Chapter 11 - 13, 15 - 16)</p>
-                            <ul>
-                                <li>
-                                    <p>Chapter 11: Regualer Expressions</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 12: Networked Programs 12.4 - 12.8 (urlib, BeautifulSoup)</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 13: Using Web Services (XML, JSON, API)</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 15: Databases and SQL</p>
-                                </li>
-                                <li>
-                                    <p>Chapter 16: Visualizing data (Network, Word Cloud)</p>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                    <p>Using jieba</p>
+                    <div class="fragment">
+                        <pre><code class="line-numbers" data-trim contenteditable data-noescape>
+from matplotlib import pyplot as plt
+from wordcloud import WordCloud
+import jieba
+
+filename = 'sanguo.txt'
+with open(filename , encoding="utf-8") as f_obj:
+    contents = f_obj.read()
+
+s = jieba.lcut(contents) 
+txt = " ".join(s)
+print(txt)
+
+font = r'C:\Windows\Fonts\simkai.ttf'
+wc = WordCloud(font_path=font, 
+               background_color='white',
+               width=1000,
+               height=800,
+               ).generate(txt)
+wc.to_file('s4.png') 
+plt.imshow(wc)  
+plt.axis('off') 
+plt.show() 
+</code></pre>
+                    </div>
                 </section>
             </section>
             <section>
                 <section data-background="#2c3e50" style="color: white; text-align: left;">
                     <h2 style="color: white">Summary</h2>
                     <ul>
-                        <li>Downloading Data</li>
-                        <li>API</li>
-                        <li>Wordcloud</li>
+                        <li>Pandas</li>
                         <ul>
-                            <li>Reading: Python Crash Course, Chapter 16, 17</li>
+                            <li>Reading: Python for Data Analysis, Chapter 7</li>
+                            <li>Reading: Python Crash Course, Chapter 10.1</li>
                         </ul>
                     </ul>
                 </section>
