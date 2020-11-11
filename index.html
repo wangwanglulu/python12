@@ -420,8 +420,9 @@ meat_to_animal = {'bacon': 'pig','pulled pork': 'pig',
                     <div class="fragment">
                         <pre><code class="line-numbers" data-trim contenteditable>
 import pandas as pd
-db =pd.read_excel('db_top.xlsx', encoding='utf-8')
+db =pd.read_excel('db_top.xlsx')
 
+# pd.read_csv('...csv',encoding='utf-8')
 # pd.read_excel('db_top.xlsx', sheet_name="Sheet1")
 # pd.read_excel('db_top.xlsx', sheet_name=0, index_col=0\
                 header=1, usecols=[0,2])
